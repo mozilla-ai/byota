@@ -1,0 +1,51 @@
+site_name: Guidance Docs
+repo_url: https://github.com/mozilla-ai/blueprint-template
+repo_name: blueprint-template
+
+nav:
+  - Home: index.md
+  - Getting Started: getting-started.md
+  - Step-by-Step Guide: step-by-step-guide.md
+  - Customization Guide: customization.md
+  - API Reference: api.md
+  - Future Features & Contributions: future-features-contributions.md
+
+theme:
+  name: material
+  palette:
+    - scheme: default
+      primary: black
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    - scheme: slate
+      primary: grey
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+  logo: images/Blueprint-logo-white.png
+  favicon: images/Blueprint-logo-black-flavicon.png
+  extra_css:
+    - assets/custom.css
+  features:
+    - content.code.copy
+    - content.tabs.link
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+
+plugins:
+- search
+- mkdocstrings:
+    handlers:
+      python:
+        options:
+          show_root_heading: true

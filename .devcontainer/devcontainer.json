@@ -1,0 +1,15 @@
+{
+    "hostRequirements": {
+     "cpus": 4,
+     "memory": "16gb",
+     "storage": "32gb"
+    },
+    "name": "Python Development Container",
+    "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+    "features": {
+      "ghcr.io/devcontainers/features/python": {
+        "version": "3.10"
+      }
+    },
+    "postCreateCommand": "bash .github/setup.sh"
+}
