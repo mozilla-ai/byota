@@ -8,7 +8,7 @@
     "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
     "features": {
       "ghcr.io/devcontainers/features/python": {
-        "version": "3.10"
+        "version": "3.11"
       }
     },
     "postCreateCommand": "bash .github/setup.sh"

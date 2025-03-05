@@ -5,7 +5,7 @@ Blueprints are customizable workflows that help developers build AI applications
 These docs are your companion to mastering this Blueprint.
 
 ### Built with
-- Python 3.10+
+- Python 3.11+
 - Tool 1
 - Tool 2
 

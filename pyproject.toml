@@ -3,14 +3,20 @@ requires = ["setuptools>=48", "setuptools_scm[toml]>=6.3.1"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "blueprint"
+name = "BYOTA"
 readme = "README.md"
 license = {text = "Apache-2.0"}
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 dynamic = ["version"]
 dependencies = [
-  "loguru",
-  "streamlit",
+  "platformdirs>=2.1",
+  "marimo==0.11.13",
+  "Mastodon.py==1.8.1",
+  "altair==5.5.0",
+  "beautifulsoup4==4.12.3",
+  "pandas==2.2.3",
+  "scikit-learn==1.5.2",
+  "matplotlib"
 ]
 
 [project.optional-dependencies]
@@ -26,9 +32,9 @@ tests = [
 ]
 
 [project.urls]
-Documentation = "https://mozilla-ai.github.io/Blueprint-template/"
-Issues = "https://github.com/mozilla-ai/Blueprint-template/issues"
-Source = "https://github.com/mozilla-ai/Blueprint-template"
+Documentation = "https://mozilla-ai.github.io/byota/"
+Issues = "https://github.com/mozilla-ai/byota/issues"
+Source = "https://github.com/mozilla-ai/byota"
 
 [tool.setuptools.packages.find]
 exclude = ["tests", "tests.*"]
