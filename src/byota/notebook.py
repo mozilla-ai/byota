@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.10.17"
+__generated_with = "0.11.16"
 app = marimo.App(width="medium")
 
 
@@ -24,6 +24,8 @@ def _():
     from sklearn.manifold import TSNE
     import pandas as pd
     from pathlib import Path
+    import json
+    import matplotlib.pyplot as plt
 
     from byota.embeddings import (
         EmbeddingService,
@@ -43,67 +45,58 @@ def _():
         alt,
         byota_mastodon,
         functools,
+        json,
         mo,
         pd,
         pickle,
+        plt,
         requests,
         time,
     )
 
 
 @app.cell
-def _(Path):
+def _(Path, byota_mastodon, json, mo, os):
     # internal variables
 
-    # client and user credentials filenames
-    clientcred_filename = "secret_clientcred.txt"
-    usercred_filename = "secret_usercred.txt"
+    # credentials filename
+    cred_filename = "auth.json"
 
     # dump files for offline mode
-    paginated_data_file = "dump_paginated_data_.pkl"
-    dataframes_data_file = "dump_dataframes_.pkl"
-    embeddings_data_file = "dump_embeddings_.pkl"
+    paginated_data_file = "dump_paginated_data.pkl"
+    dataframes_data_file = "dump_dataframes.pkl"
+    embeddings_data_file = "dump_embeddings.pkl"
 
-    app_registered = True if Path(clientcred_filename).is_file() else False
+    # login (and break if that does not work)
+    if Path(cred_filename).is_file():
+        with Path("auth.json").open() as f:
+            credentials = json.load(f)
+        mastodon_client = byota_mastodon.login(
+            access_token=credentials.get("MASTODON_ACCESS_TOKEN"),
+            api_base_url=credentials.get("MASTODON_API_BASE_URL")
+        )
+    else:
+        mastodon_client = byota_mastodon.login(
+            access_token=os.environ.get('MASTODON_ACCESS_TOKEN'),
+            api_base_url=os.environ.get('MASTODON_API_BASE_URL')
+        )
+
+    mo.stop(mastodon_client is None,
+            mo.md("**Authentication error: please check your credentials.**").center())
     return (
-        app_registered,
-        clientcred_filename,
+        cred_filename,
+        credentials,
         dataframes_data_file,
         embeddings_data_file,
+        f,
+        mastodon_client,
         paginated_data_file,
-        usercred_filename,
     )
 
 
 @app.cell
-def _(app_registered, mo, reg_form, show_if):
-    show_if(not app_registered, reg_form, mo.md("**Your application is registered**"))
-    return
-
-
-@app.cell
-def _(
-    app_registered,
-    byota_mastodon,
-    clientcred_filename,
-    invalid_form,
-    mo,
-    reg_form,
-):
-    if not app_registered:
-        mo.stop(invalid_form(reg_form), mo.md("**Invalid values provided in the registration form**"))
-
-        byota_mastodon.register_app(
-            reg_form.value['application_name'],
-            reg_form.value['api_base_url'],
-            clientcred_filename
-        )
-    return
-
-
-@app.cell
-def _(auth_form):
-    auth_form
+def _(configuration_form):
+    configuration_form
     return
 
 
@@ -111,54 +104,42 @@ def _(auth_form):
 def _(
     LLamafileEmbeddingService,
     OllamaEmbeddingService,
-    auth_form,
-    byota_mastodon,
-    clientcred_filename,
+    configuration_form,
     invalid_form,
     mo,
     timelines_dict,
-    usercred_filename,
 ):
     # check for anything invalid in the form
-    mo.stop(invalid_form(auth_form),
-            mo.md("**Submit the form to continue.**"))
-
-    # login (and break if that does not work)
-    mastodon_client = byota_mastodon.login(clientcred_filename,
-                                           usercred_filename,
-                                           auth_form.value.get("login"),
-                                           auth_form.value.get("pw")
-                                          )
-    mo.stop(mastodon_client is None,
-            mo.md("**Authentication error.**"))
+    mo.stop(invalid_form(configuration_form),
+            mo.md("**Submit the form to continue.**").center())
 
     # instatiate an embedding service (and break if it does not work)
-    if auth_form.value["emb_server"]=="llamafile":
+    if configuration_form.value["emb_server"]=="llamafile":
         embedding_service = LLamafileEmbeddingService(
-            auth_form.value["emb_server_url"]
+            configuration_form.value["emb_server_url"]
         )
     else:
         embedding_service = OllamaEmbeddingService(
-            auth_form.value["emb_server_url"],
-            auth_form.value["emb_server_model"]
+            configuration_form.value["emb_server_url"],
+            configuration_form.value["emb_server_model"]
         )
 
     mo.stop(
         not embedding_service.is_working(),
-        mo.md(f"**Cannot access {auth_form.value['emb_server']} embedding server.**"),
+        mo.md(f"**Cannot access {configuration_form.value['emb_server']} embedding server.**"),
     )
 
     # collect the names of the timelines we want to download from
     timelines = []
     for k in timelines_dict.keys():
-        if auth_form.value[k]:
+        if configuration_form.value[k]:
             tl_string = timelines_dict[k]
             if tl_string in ["tag", "list"]:
-                tl_string += f'/{auth_form.value[f"{k}_txt"]}'
+                tl_string += f'/{configuration_form.value[f"{k}_txt"]}'
             timelines.append(tl_string)
 
     # set offline mode
-    offline_mode = auth_form.value["offline_mode"]
+    offline_mode = configuration_form.value["offline_mode"]
 
     # choose what to read from cache
     cached_timelines =  offline_mode
@@ -170,7 +151,6 @@ def _(
         cached_timelines,
         embedding_service,
         k,
-        mastodon_client,
         offline_mode,
         timelines,
         tl_string,
@@ -178,8 +158,10 @@ def _(
 
 
 @app.cell
-def _(mo):
-    mo.md(r"""# Getting data from my Mastodon account...""")
+def _(mo, timelines):
+    mo.md(f"""
+    ###Downloading paginated data from the following timelines: {", ".join(timelines)}
+    """).center()
     return
 
 
@@ -199,20 +181,22 @@ def _(
                                                 timelines,
                                                 cached_timelines,
                                                 paginated_data_file)
-    mo.stop(paginated_data is None, mo.md(f"**Issues connecting to Mastodon**"))
+    mo.stop(paginated_data is None, mo.md(f"**Issues getting paginated data**"))
 
 
     dataframes = build_cache_dataframes(paginated_data,
                                          cached_dataframes,
                                          dataframes_data_file)
 
-    mo.stop(paginated_data is None, mo.md(f"**Issues connecting to Mastodon**"))
+    mo.stop(paginated_data is None, mo.md(f"**Issues building dataframes**"))
     return dataframes, paginated_data
 
 
 @app.cell
-def _(mo):
-    mo.md("""# My timeline(s)""")
+def _(dataframes, mo):
+    mo.md(f"""
+    ### Calculating embeddings for the downloaded timeline{"s" if len(dataframes.keys())>1 else ""}.
+    """).center()
     return
 
 
@@ -223,12 +207,14 @@ def _(
     dataframes,
     embedding_service,
     embeddings_data_file,
+    mo,
 ):
     # calculate embeddings
     embeddings = build_cache_embeddings(embedding_service,
                                         dataframes,
                                         cached_embeddings,
                                         embeddings_data_file)
+    mo.stop(embeddings is None, mo.md(f"**Issues calculating embeddings**"))
     return (embeddings,)
 
 
@@ -287,14 +273,13 @@ def _(chart, mo):
 
 
 @app.cell
-def _(mo):
-    mo.md("""# Timeline search""")
-    return
+def _(embeddings, mo, query_form):
+    mo.stop(embeddings is None)
 
-
-@app.cell
-def _(query_form):
-    query_form
+    mo.vstack([
+        mo.md("# Timeline search"),
+        query_form
+    ])
     return
 
 
@@ -307,80 +292,44 @@ def _(SearchService, all_embeddings, df_, embedding_service, query_form):
 
 
 @app.cell
-def _(all_embeddings, np, query_form, search_service):
-    import matplotlib.pyplot as plt
-
-    mse = search_service.most_similar_embeddings(query_form.value)
-    diff_small = mse[0]-mse[1]
-    diff_mid = mse[0]-mse[4]
-    diff_large = mse[0]-all_embeddings[42]
-
-    plt.rcParams["figure.figsize"] = (20,3)
-    plt.plot(diff_large)
-    plt.plot(diff_small)
-    plt.legend([f"Diff with a random embedding (norm={np.linalg.norm(diff_large):.2f})", 
-                f"Diff with a similar embedding (norm={np.linalg.norm(diff_small):.2f})"])
-
-    plt.show()
-    return diff_large, diff_mid, diff_small, mse, plt
-
-
-@app.cell
-def _(rerank_form):
+def _(embeddings, mo, rerank_form):
+    mo.stop(embeddings is None)
     rerank_form
     return
 
 
 @app.cell
-def _(byota_mastodon, mastodon_client, mo, rerank_form):
+def _(
+    byota_mastodon,
+    dataframes,
+    embedding_service,
+    embeddings,
+    get_compact_data,
+    mastodon_client,
+    mo,
+    np,
+    pd,
+    rerank_form,
+    time,
+):
+    mo.stop(embeddings is None)
+
     # check for anything invalid in the form
     mo.stop(rerank_form.value is None,
             mo.md("**Submit the form to continue.**"))
 
+    timeline_to_rerank = rerank_form.value["timeline_to_rerank"]
+
+    # download and calculate embeddings of user statuses
     user_statuses = byota_mastodon.get_paginated_statuses(mastodon_client,
                         max_pages=rerank_form.value["num_user_status_pages"],
                         exclude_reblogs=rerank_form.value["exclude_reblogs"])
-    return (user_statuses,)
-
-
-@app.cell
-def _(mo):
-    mo.md("""## Your statuses:""")
-    return
-
-
-@app.cell
-def _(get_compact_data, pd, user_statuses):
     user_statuses_df = pd.DataFrame(get_compact_data(user_statuses),
                                     columns=["id", "text"])
-    user_statuses_df
-    return (user_statuses_df,)
-
-
-@app.cell
-def _(mo):
-    mo.md("""## Your re-ranked timeline:""")
-    return
-
-
-@app.cell
-def _(
-    dataframes,
-    embedding_service,
-    embeddings,
-    np,
-    rerank_form,
-    time,
-    user_statuses_df,
-):
-    # calculate embeddings for user statuses
     user_statuses_embeddings = embedding_service.calculate_embeddings(user_statuses_df["text"])
-
-    timeline_to_rerank = rerank_form.value["timeline_to_rerank"]
 
     # build an index of most similar statuses to the ones
     # published / boosted by the user
-
     rerank_start_time = time.time()
     # index is in reverse order (from largest to smallest similarity)
     idx = np.flip(
@@ -400,12 +349,20 @@ def _(
 
     print(time.time()-rerank_start_time)
 
-    # return the statuses sorted by that index
-    dataframes[timeline_to_rerank].iloc[idx][['label','text']]
+    # show everything
+    mo.vstack([
+        mo.md("## Your statuses:"),
+        user_statuses_df,
+        mo.md("## Your re-ranked timeline:"),
+        # show statuses sorted by idx
+        dataframes[timeline_to_rerank].iloc[idx][['label','text']]
+    ])
     return (
         idx,
         rerank_start_time,
         timeline_to_rerank,
+        user_statuses,
+        user_statuses_df,
         user_statuses_embeddings,
     )
 
@@ -441,8 +398,22 @@ def _():
 
 
 @app.cell
-def _(mo):
-    mo.md("""### My own posts, re-ranked according to their similarity to posts in tag/gopher""")
+def _(mo, rerank_form, tag_form):
+    mo.stop(rerank_form.value is None)
+
+    mo.vstack([
+        mo.md("""
+        # Re-Ranking your own posts
+        Depending on the timeline you are considering, it might be more or less hard
+        to understand how well the re-ranking worked.
+        To give you a better sense of the effect of re-ranking, let us take the posts
+        you wrote and re-rank them according to some well-known tag.
+        Feel free to test the following code with different tags, depending on your
+        various interests, and see whether your own posts related to a given interest
+        are surfaced by a related tag.
+        """),
+        tag_form
+    ])
     return
 
 
@@ -452,50 +423,92 @@ def _(
     embedding_service,
     get_compact_data,
     mastodon_client,
-    np,
+    mo,
     pd,
+    rerank_form,
 ):
+    mo.stop(rerank_form.value is None)
+
     my_posts = byota_mastodon.get_paginated_statuses(mastodon_client,
                         max_pages=10,
                         exclude_reblogs=True, exclude_replies=True)
     my_posts_df = pd.DataFrame(get_compact_data(my_posts),
                                     columns=["id", "text"])
     my_posts_embeddings = embedding_service.calculate_embeddings(my_posts_df["text"])
+    return my_posts, my_posts_df, my_posts_embeddings
 
-    ds_posts = byota_mastodon.get_paginated_data(mastodon_client, "tag/gopher", max_pages=1)
-    ds_posts_df = pd.DataFrame(get_compact_data(ds_posts),
+
+@app.cell
+def _(
+    byota_mastodon,
+    embedding_service,
+    get_compact_data,
+    mastodon_client,
+    mo,
+    my_posts_df,
+    my_posts_embeddings,
+    np,
+    pd,
+    tag_form,
+):
+    tag_name = f"tag/{tag_form.value}"
+
+    tag_posts = byota_mastodon.get_paginated_data(mastodon_client, tag_name, max_pages=1)
+    tag_posts_df = pd.DataFrame(get_compact_data(tag_posts),
                                     columns=["id", "text"])
-    ds_posts_embeddings = embedding_service.calculate_embeddings(ds_posts_df["text"])
+    tag_posts_embeddings = embedding_service.calculate_embeddings(tag_posts_df["text"])
 
-
+    # calculate the re-ranking index
     my_idx = np.flip(np.argsort(np.sum(np.dot(
-                        ds_posts_embeddings,
+                        tag_posts_embeddings,
                         my_posts_embeddings.T), axis=0)))
-    my_posts_df["scores"]= np.sum(np.dot(ds_posts_embeddings,my_posts_embeddings.T), axis=0)
-    my_posts_df.iloc[my_idx][['text', 'scores']]
+    # let us also show the similarity scores used to calculate the index
+    my_posts_df["scores"]= np.sum(np.dot(tag_posts_embeddings,my_posts_embeddings.T), axis=0)
+
+    mo.vstack([
+        mo.md(f"### Your own posts, re-ranked according to their similarity to posts in {tag_name}"),
+        my_posts_df.iloc[my_idx][['text', 'scores']]
+    ])
     # my_posts_df[['text', 'scores']]
-    return (
-        ds_posts,
-        ds_posts_df,
-        ds_posts_embeddings,
-        my_idx,
-        my_posts,
-        my_posts_df,
-        my_posts_embeddings,
-    )
+    return my_idx, tag_name, tag_posts, tag_posts_df, tag_posts_embeddings
+
+
+@app.cell
+def _():
+    # my_posts = byota_mastodon.get_paginated_statuses(mastodon_client,
+    #                     max_pages=10,
+    #                     exclude_reblogs=True, exclude_replies=True)
+    # my_posts_df = pd.DataFrame(get_compact_data(my_posts),
+    #                                 columns=["id", "text"])
+    # my_posts_embeddings = embedding_service.calculate_embeddings(my_posts_df["text"])
+
+    # ds_posts = byota_mastodon.get_paginated_data(mastodon_client, "tag/gopher", max_pages=1)
+    # ds_posts_df = pd.DataFrame(get_compact_data(ds_posts),
+    #                                 columns=["id", "text"])
+    # ds_posts_embeddings = embedding_service.calculate_embeddings(ds_posts_df["text"])
+
+
+    # my_idx = np.flip(np.argsort(np.sum(np.dot(
+    #                     ds_posts_embeddings,
+    #                     my_posts_embeddings.T), axis=0)))
+    # my_posts_df["scores"]= np.sum(np.dot(ds_posts_embeddings,my_posts_embeddings.T), axis=0)
+
+    # mo.vstack([
+    #     mo.md("### My own posts, re-ranked according to their similarity to posts in tag/gopher"),
+    #     my_posts_df.iloc[my_idx][['text', 'scores']]
+    # ])
+    # # my_posts_df[['text', 'scores']]
+    return
 
 
 @app.cell
 def _(mo):
     # Create the Configuration form
 
-    auth_form = (
+    configuration_form = (
         mo.md(
             """
         # Configuration
-        **Mastodon Credentials**
-
-        {login}         {pw}
 
         **Timelines**
 
@@ -517,8 +530,6 @@ def _(mo):
     """
         )
         .batch(
-            login=mo.ui.text(label="Login:"),
-            pw=mo.ui.text(label="Password:", kind="password"),
             tl_home=mo.ui.checkbox(label="Home", value=True),
             tl_local=mo.ui.checkbox(label="Local"),
             tl_public=mo.ui.checkbox(label="Public"),
@@ -540,7 +551,7 @@ def _(mo):
                 label="Embedding server model:",
                 value="all-minilm"
             ),
-            offline_mode=mo.ui.checkbox(label="Run in offline mode"),
+            offline_mode=mo.ui.checkbox(label="Run in offline mode (experimental)"),
         )
         .form(show_clear_button=True, bordered=True)
     )
@@ -566,7 +577,7 @@ def _(mo):
                 return True
 
         return False
-    return auth_form, invalid_form, timelines_dict
+    return configuration_form, invalid_form, timelines_dict
 
 
 @app.cell
@@ -580,7 +591,7 @@ def _(mo):
 
         {num_user_status_pages}    {exclude_reblogs}
 
-        **Timelines**
+        **Timeline to rerank**
 
         {timeline_to_rerank}
     """
@@ -599,61 +610,6 @@ def _(mo):
 
 @app.cell
 def _(mo):
-    # Create a registration form
-
-    default_api_base_url = "https://your.instance.url"
-
-    reg_form = (
-        mo.md(
-            """
-        # App Registration
-        **Register your application**
-
-        {application_name}
-        {api_base_url}
-
-    """
-        )
-        .batch(
-            application_name=mo.ui.text(
-                label="Application name:",
-                value="my_timeline_algorithm",
-                full_width=True
-            ),
-            api_base_url=mo.ui.text(
-                label="Mastodon instance API base URL:",
-                value=default_api_base_url,
-                full_width=True
-            ),
-        )
-        .form(show_clear_button=True, bordered=True)
-    )
-
-    def invalid_reg_form(reg_form):
-        """A reg form is invalid if the URL is the default one"""
-        if reg_form.value is None:
-            return True
-
-        for k in reg_form.value.keys():
-            if reg_form.value[k] is None or reg_form.value[k]=="":
-                return True
-
-        if reg_form.value['api_base_url']==default_api_base_url:
-            return True
-
-        return False
-
-
-    def show_if(condition: bool, if_true, if_false):
-        if condition:
-            return if_true
-        else:
-            return if_false
-    return default_api_base_url, invalid_reg_form, reg_form, show_if
-
-
-@app.cell
-def _(mo):
     query_form = mo.ui.text(
         value="42",
         label="Enter a status id or some free-form text to find the most similar statuses:\n",
@@ -663,7 +619,16 @@ def _(mo):
 
 
 @app.cell
-def _(BeautifulSoup, EmbeddingService, byota_mastodon, pd, pickle, time):
+def _(mo):
+    tag_form = mo.ui.text(
+        value="gopher",
+        label="Enter a tag name:\n",
+    )
+    return (tag_form,)
+
+
+@app.cell
+def _(BeautifulSoup, EmbeddingService, byota_mastodon, mo, pd, pickle, time):
     def build_cache_paginated_data(mastodon_client,
                                    timelines: list,
                                    cached: bool,
@@ -683,9 +648,12 @@ def _(BeautifulSoup, EmbeddingService, byota_mastodon, pd, pickle, time):
 
         else:
             print(f"Loading cached paginated data from {paginated_data_file}")
-            with open(paginated_data_file, "rb") as f:
-                paginated_data = pickle.load(f)
-
+            try:
+                with open(paginated_data_file, "rb") as f:
+                    paginated_data = pickle.load(f)
+            except FileNotFoundError:
+                print(f"File {paginated_data_file} not found.")
+                return None
         return paginated_data
 
 
@@ -708,8 +676,12 @@ def _(BeautifulSoup, EmbeddingService, byota_mastodon, pd, pickle, time):
                 pickle.dump(dataframes, f)
         else:
             print(f"Loading cached dataframes from {dataframes_data_file}")
-            with open(dataframes_data_file, "rb") as f:
-                dataframes = pickle.load(f)
+            try:
+                with open(dataframes_data_file, "rb") as f:
+                    dataframes = pickle.load(f)
+            except FileNotFoundError:
+                print(f"File {dataframes_data_file} not found.")
+                return None
 
         return dataframes
 
@@ -726,16 +698,22 @@ def _(BeautifulSoup, EmbeddingService, byota_mastodon, pd, pickle, time):
         if not cached:
             embeddings = {}
             for k in dataframes:
-                print(f"Embedding statuses from timeline: {k}")
-                tt_ = time.time()
-                embeddings[k] = embedding_service.calculate_embeddings(dataframes[k]["text"])
-                print(time.time() - tt_)
+                with mo.status.progress_bar(total=len(dataframes[k]),
+                                            title=f"Embedding posts from: {k}") as bar:
+                    print(f"Embedding statuses from timeline: {k}")
+                    tt_ = time.time()
+                    embeddings[k] = embedding_service.calculate_embeddings(dataframes[k]["text"], bar)
+                    print(time.time() - tt_)
             with open(embeddings_data_file, "wb") as f:
                 pickle.dump(embeddings, f)
         else:
             print(f"Loading cached embeddings from {embeddings_data_file}")
-            with open(embeddings_data_file, "rb") as f:
-                embeddings = pickle.load(f)
+            try:
+                with open(embeddings_data_file, "rb") as f:
+                    embeddings = pickle.load(f)
+            except FileNotFoundError:
+                print(f"File {embeddings_data_file} not found.")
+                return None
 
         return embeddings
 

@@ -21,15 +21,16 @@ class EmbeddingService:
         """
         pass
 
-    def calculate_embeddings(self, texts: list[str]) -> np.ndarray:
+    def calculate_embeddings(self, texts: list[str], bar=None) -> np.ndarray:
         """Given a list of input texts, returns all the embeddings
         as a numpy array.
         """
-        pass
 
         embeddings = []
         for i, t in enumerate(texts):
             embeddings.append(self.get_embedding(str(t)))
+            if bar is not None:
+                bar.update()
             if not (i % 10):
                 print(".", end="")
         return np.array(embeddings)
