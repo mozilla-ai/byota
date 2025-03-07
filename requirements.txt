@@ -3,7 +3,6 @@ beautifulsoup4==4.13.3
 loguru==0.7.3
 marimo==0.11.16
 Mastodon.py==2.0.1
-matplotlib==3.10.1
 pandas==2.2.3
 platformdirs>=2.1
 pyarrow==19.0.1

@@ -5,11 +5,12 @@ app = marimo.App(width="medium")
 
 
 @app.cell
-def _():
+async def _():
     # Uncomment this code if you want to run the notebook on marimo cloud
-    # import micropip
-    # await micropip.install("Mastodon.py")
-    return
+    import micropip
+    await micropip.install("Mastodon.py")
+    await micropip.install("loguru")
+    return (micropip,)
 
 
 @app.cell
@@ -25,7 +26,7 @@ def _():
     import pandas as pd
     from pathlib import Path
     import json
-    import matplotlib.pyplot as plt
+    import os
 
     from byota.embeddings import (
         EmbeddingService,
@@ -47,9 +48,9 @@ def _():
         functools,
         json,
         mo,
+        os,
         pd,
         pickle,
-        plt,
         requests,
         time,
     )
