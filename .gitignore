@@ -166,3 +166,4 @@ cython_debug/
 # byota-specific files
 auth.json
 dump_*.pkl
+.DS_Store
