@@ -9,77 +9,59 @@
   </picture>
 </p>
 
+# Build Your Own Timeline Algorithm
+
+[![](https://dcbadge.limes.pink/api/server/YuMNeuKStr?style=flat)](https://discord.gg/YuMNeuKStr)
+[![Docs](https://github.com/mozilla-ai/byota/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/byota/actions/workflows/docs.yaml/)
+[![Tests](https://github.com/mozilla-ai/byota/actions/workflows/tests.yaml/badge.svg)](https://github.com/mozilla-ai/byota/actions/workflows/tests.yaml/)
+[![Ruff](https://github.com/mozilla-ai/byota/actions/workflows/lint.yaml/badge.svg?label=Ruff)](https://github.com/mozilla-ai/byota/actions/workflows/lint.yaml/)
+
+
+
+👉 MEANS Work In Progress
+
 Timeline algorithms should be useful for people, not for companies. Their quality should not be evaluated in terms of how much more time people spend on a platform, but rather in terms of how well they serve their users’ purposes. Objectives might differ, from delving deeper into a topic to connecting with like-minded communities, solving a problem or just passing time until the bus arrives. How these objectives are reached might differ too, e.g. while respecting instances’ bandwidth, one’s own as well as others’ privacy, algorithm trustworthiness and software licenses.
 
-This blueprint introduces an approach to personal, local timeline algorithms that people can either run out-of-the-box or customize. The approach relies on a stack which makes use of [Mastodon.py](https://github.com/halcy/Mastodon.py) to get recent timeline data, [llamafile](https://github.com/Mozilla-Ocho/llamafile) to calculate post embeddings locally, and [marimo](https://github.com/marimo-team/marimo) to provide a UI that runs in one’s own browser. Using this stack, you can visualize, search, and re-rank posts from the fediverse without any of them leaving your computer.
+This blueprint introduces an approach to personal, local timeline algorithms that people can either run out-of-the-box or customize.
 
 ![A 2D scatterplot representing statuses from different Mastodon timelines (home, local, public, and tag/gopher). Some areas of the plot are labeled as geographical places in a map (e.g. "The AI peninsula", "The Billionaiers swamp", etc.)](images/map.png)
+*A 2D map of multiple timelines created with BYOTA (labels have been manually added).*
 
 
 📘 To explore this project further and discover other Blueprints, visit the [**Blueprints Hub**](https://developer-hub.mozilla.ai/).
 
-👉 📖 For more detailed guidance on using this project, please visit our [**Docs here**](https://mozilla-ai.github.io/Blueprint-template/)
+ 📖 For more detailed guidance on using this project, please visit our [**Docs here**](https://mozilla-ai.github.io/BYOTA/)
 
-### Built with
-- Python 3.11+
+## Built with
+- ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
 - [Mastodon.py](https://github.com/halcy/Mastodon.py)
 - [Llamafile](https://github.com/Mozilla-Ocho/llamafile)
 - [Marimo](https://github.com/marimo-team/marimo)
 
+## See it in action
+
+- [Talk @ FOSDEM 2025](https://video.fosdem.org/2025/ud2208/fosdem-2025-5601-build-your-own-timeline-algorithm.mp4)
+
+- 👉 DEMO (Coming soon)
+
+
 ## Quick-start
 
-You can run BYOTA in two different ways: as a Docker container or by installing its components into your system.
-
-### Running BYOTA in a container
-
-### Running BYOTA into your system
-
-#### Run a local embedding server
-
-BYOTA relies on *sentence embeddings* to internally represent statuses from your Mastodon timeline. You can think about them as numerical descriptors of Mastodon statuses that are closer the more semantically similar two statuses are.
-
-BYOTA supports both [llamafile](https://github.com/Mozilla-Ocho/llamafile) and [ollama](https://ollama.com/) as embedding servers:
-
-- to install a llamafile embedding server, follow the instructions you find
-  [here](https://github.com/Mozilla-Ocho/llamafile/blob/main/llamafile/server/doc/getting_started.md):
-  the `all-MiniLM-L6-v2` model cited there works perfectly with the current version of BYOTA, but you can also try others you can find in the *Text Embedding Models* section [here](https://github.com/Mozilla-Ocho/llamafile/).
-
-- to install ollama and the `all-MiniLM` model, first download the executable for your OS from [here](https://ollama.com/),
-  then install the model with the command `ollama pull all-minilm`. If you are curious to try more models,
-  you can check the list of embedding models available [here](https://ollama.com/search?c=embedding).
-
-> [!NOTE]
-> The default embedding server URL provided in the configuration form is `http://localhost:8080/embedding` which is llamafile's default.
-> If you have chosen to use ollama instead, at the moment you need to manually provide its default URL which is `http://localhost:11434/api/embed`.
-
-
-#### Running the notebook
-
-- Set up and activate your favorite python env
-- run `pip install -r requirements`
-- run `marimo edit notebook.py`
-- a browser window will open with the notebooks
-
-The first time you run the notebook, you will need to create a new client application. You can do this by filling up the registration form with an
-application name and the base URL of your Mastodon instance's API:
-
-![A form called "App Registration" with two fields called "Application name" and "Mastodon instance API base URL"](images/registration.png)
-
-The Configuration section allows you to provide your credentials, choose which timeline(s) you want to download, the embeddings server API you want to use (see details in the previous section), and whether to run in offline mode (in this case statuses won't be downloaded but read from a file).
-
-![A configuration panel showing the sections "Mastodon Credentials", "Timelines", "Embeddings", and "Caching"](images/configuration.png)
+👉 Instructions for the BYOTA docker demo:
+- locally with Docker
+- on HF
 
 
 ## How it Works
-
+BYOTA relies on a stack which makes use of [Mastodon.py](https://github.com/halcy/Mastodon.py) to get recent timeline data, [llamafile](https://github.com/Mozilla-Ocho/llamafile) to calculate post embeddings locally, and [marimo](https://github.com/marimo-team/marimo) to provide a UI that runs in one’s own browser. Using this stack, you can visualize, search, and re-rank posts from the fediverse without any of them leaving your computer.
 
 ## Pre-requisites
 
 - **System requirements**:
   - OS: Windows, macOS, or Linux
   - Python 3.11 or higher
-  - Minimum RAM:
-  - Disk space:
+  - 👉 Minimum RAM: 1GB (double check)
+  - Disk space: 1.3GB for the Docker image, or ~1GB for local installation (~800MB for code + deps, plus the embedding model of your choice). If you want to compile llamafile yourself, you'll need ~5GB extra (NOTE: the Docker image already contains it)
 
 - **Dependencies**:
   - Dependencies listed in `pyproject.toml`
@@ -87,7 +69,7 @@ The Configuration section allows you to provide your credentials, choose which t
 
 ## Troubleshooting
 
-The code is still experimental and will be subject to breaking updates in the next few weeks. Please be patient and check often for the latest updates! 🙇
+The code is still experimental and will be subject to breaking updates in the next few weeks. Please be patient, raise issues, and check often for the latest updates! 🙇
 
 ## License
 

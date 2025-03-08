@@ -5,16 +5,22 @@
 
 ## **Overview**
 
+- BYOTA components and architecture
+- explain it is more like a playground for local algorithms, but allows to easily share the tool with ppl who are not developers
+
+## Running BYOTA with a real Mastodon account
+
+- explain how to create an application and get a token
 
 ---
 
-## **Step 1**
+Alternative deployments
 
+## Run BYOTA in the Docker container
 
-## **Step 2**
+## Run BYOTA with a local installation
 
-
-## **Step 3**
+## Serve and run BYOTA as WASM
 
 
 
