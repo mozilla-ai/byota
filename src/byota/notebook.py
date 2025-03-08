@@ -7,7 +7,7 @@ app = marimo.App(width="medium")
 @app.cell
 async def _():
     # Uncomment this code if you want to run the notebook on marimo cloud
-    import micropip
+    import micropip # type: ignore
     await micropip.install("Mastodon.py")
     await micropip.install("loguru")
     return (micropip,)
@@ -114,7 +114,7 @@ def _(
     mo.stop(invalid_form(configuration_form),
             mo.md("**Submit the form to continue.**").center())
 
-    # instatiate an embedding service (and break if it does not work)
+    # instantiate an embedding service (and break if it does not work)
     if configuration_form.value["emb_server"]=="llamafile":
         embedding_service = LLamafileEmbeddingService(
             configuration_form.value["emb_server_url"]
@@ -182,14 +182,14 @@ def _(
                                                 timelines,
                                                 cached_timelines,
                                                 paginated_data_file)
-    mo.stop(paginated_data is None, mo.md(f"**Issues getting paginated data**"))
+    mo.stop(paginated_data is None, mo.md("**Issues getting paginated data**"))
 
 
     dataframes = build_cache_dataframes(paginated_data,
                                          cached_dataframes,
                                          dataframes_data_file)
 
-    mo.stop(paginated_data is None, mo.md(f"**Issues building dataframes**"))
+    mo.stop(paginated_data is None, mo.md("**Issues building dataframes**"))
     return dataframes, paginated_data
 
 
@@ -215,7 +215,7 @@ def _(
                                         dataframes,
                                         cached_embeddings,
                                         embeddings_data_file)
-    mo.stop(embeddings is None, mo.md(f"**Issues calculating embeddings**"))
+    mo.stop(embeddings is None, mo.md("**Issues calculating embeddings**"))
     return (embeddings,)
 
 
@@ -687,7 +687,7 @@ def _(BeautifulSoup, EmbeddingService, byota_mastodon, mo, pd, pickle, time):
         return dataframes
 
 
-    def build_cache_embeddings(embedding_service: EmbeddingService,
+    def build_cache_embeddings(embedding_service: EmbeddingService, # type: ignore
                                dataframes: dict[str, any],
                                cached: bool,
                                embeddings_data_file: str) -> dict[str, any]:
