@@ -52,4 +52,3 @@ application name and the base URL of your Mastodon instance's API:
 The Configuration section allows you to provide your credentials, choose which timeline(s) you want to download, the embeddings server API you want to use (see details in the previous section), and whether to run in offline mode (in this case statuses won't be downloaded but read from a file).
 
 ![A configuration panel showing the sections "Mastodon Credentials", "Timelines", "Embeddings", and "Caching"](images/configuration.png)
-

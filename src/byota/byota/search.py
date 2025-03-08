@@ -4,11 +4,9 @@ from byota.embeddings import EmbeddingService
 
 # -- Similarity --------------------------------------------------------------
 
-class SearchService():
 
-    def __init__(self, 
-                 embeddings: np.ndarray,
-                 embedding_service: EmbeddingService):
+class SearchService:
+    def __init__(self, embeddings: np.ndarray, embedding_service: EmbeddingService):
         self._embeddings = embeddings
         self._embedding_service = embedding_service
         self._tree = spatial.KDTree(self._embeddings)
@@ -18,13 +16,14 @@ class SearchService():
         or a string. As similarity is calculated among embeddings, this
         method makes sure we always return an embedding.
         """
+
         def is_integer_string(s):
             try:
                 int(s)
                 return True
             except ValueError:
                 return False
-            
+
         if is_integer_string(query):
             return self._embeddings[int(query)]
         else:

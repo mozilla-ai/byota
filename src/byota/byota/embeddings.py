@@ -4,6 +4,7 @@ import requests
 
 # -- Embeddings --------------------------------------------------------------
 
+
 class EmbeddingService:
     def __init__(self, url: str, model: str = None):
         self._url = url
@@ -37,14 +38,12 @@ class EmbeddingService:
 
 
 class LLamafileEmbeddingService(EmbeddingService):
-
     def is_working(self):
         response = requests.request(
             url=self._url,
             method="POST",
         )
         return response.status_code == 200
-
 
     def get_embedding(self, text: str) -> list:
         try:
@@ -70,15 +69,11 @@ class OllamaEmbeddingService(EmbeddingService):
         response = requests.request(
             url=self._url,
             method="POST",
-            data=json.dumps({
-                "model": self._model,
-                "input": ""
-            }),
+            data=json.dumps({"model": self._model, "input": ""}),
         )
         return response.status_code
 
     def get_embedding(self, text: str):
-
         # workaround for ollama breaking with empty input text
         if not text:
             text = " "
@@ -87,10 +82,7 @@ class OllamaEmbeddingService(EmbeddingService):
             response = requests.request(
                 url=self._url,
                 method="POST",
-                data=json.dumps({
-                    "model": self._model,
-                    "input": text
-                }),
+                data=json.dumps({"model": self._model, "input": text}),
             )
             response.raise_for_status()
         except requests.RequestException as e:
