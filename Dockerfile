@@ -21,7 +21,7 @@ RUN mkdir out && \
 FROM python:3.11-slim AS out
  
 RUN apt-get update && \
-    apt-get install -y wget
+    apt-get install -y wget git
 
 # Create a non-root user
 RUN addgroup --gid 1000 user && \
@@ -36,7 +36,8 @@ COPY --from=builder /download/out/share /usr/local/share/man
 
 # Copy the repo's code
 COPY . /home/user/byota
-
+## Clone the repo's code - when the repo is public
+#RUN git clone https://github.com/mozilla-ai/byota.git && \
 RUN chown -R user:user /home/user/byota && \
     chmod +x /home/user/byota/entrypoint.sh && \
     pip install -r /home/user/byota/requirements.txt
