@@ -55,4 +55,3 @@ EXPOSE 8080 2718
 
 # Set entrypoint
 ENTRYPOINT ["/home/user/byota/entrypoint.sh"]
-

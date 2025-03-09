@@ -10,4 +10,4 @@ sleep 1
 head /tmp/llamafiler.logs
 
 # Start marimo
-cd byota/src/byota && marimo run --headless --host 0.0.0.0 --token --token-password byota notebook.py
+cd byota/src && marimo run --headless --host 0.0.0.0 --token --token-password byota notebook.py
