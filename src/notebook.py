@@ -1,17 +1,17 @@
 import marimo
 
-__generated_with = "0.11.16"
+__generated_with = "0.11.13"
 app = marimo.App(width="medium")
 
 
 @app.cell
-async def _():
-    # Uncomment this code if you want to run the notebook on marimo cloud
-    import micropip  # type: ignore
+def _():
+    # # Uncomment this code if you want to run the notebook on marimo cloud
+    # import micropip  # type: ignore
 
-    await micropip.install("Mastodon.py")
-    await micropip.install("loguru")
-    return (micropip,)
+    # await micropip.install("Mastodon.py")
+    # await micropip.install("loguru")
+    return
 
 
 @app.cell
@@ -36,7 +36,6 @@ def _():
     )
     import byota.mastodon as byota_mastodon
     from byota.search import SearchService
-
     return (
         BeautifulSoup,
         EmbeddingService,
@@ -490,33 +489,6 @@ def _(
 
 
 @app.cell
-def _():
-    # my_posts = byota_mastodon.get_paginated_statuses(mastodon_client,
-    #                     max_pages=10,
-    #                     exclude_reblogs=True, exclude_replies=True)
-    # my_posts_df = pd.DataFrame(get_compact_data(my_posts),
-    #                                 columns=["id", "text"])
-    # my_posts_embeddings = embedding_service.calculate_embeddings(my_posts_df["text"])
-
-    # ds_posts = byota_mastodon.get_paginated_data(mastodon_client, "tag/gopher", max_pages=1)
-    # ds_posts_df = pd.DataFrame(get_compact_data(ds_posts),
-    #                                 columns=["id", "text"])
-    # ds_posts_embeddings = embedding_service.calculate_embeddings(ds_posts_df["text"])
-
-    # my_idx = np.flip(np.argsort(np.sum(np.dot(
-    #                     ds_posts_embeddings,
-    #                     my_posts_embeddings.T), axis=0)))
-    # my_posts_df["scores"]= np.sum(np.dot(ds_posts_embeddings,my_posts_embeddings.T), axis=0)
-
-    # mo.vstack([
-    #     mo.md("### My own posts, re-ranked according to their similarity to posts in tag/gopher"),
-    #     my_posts_df.iloc[my_idx][['text', 'scores']]
-    # ])
-    # # my_posts_df[['text', 'scores']]
-    return
-
-
-@app.cell
 def _(mo):
     # Create the Configuration form
 
@@ -592,7 +564,6 @@ def _(mo):
                 return True
 
         return False
-
     return configuration_form, invalid_form, timelines_dict
 
 
@@ -752,7 +723,6 @@ def _(BeautifulSoup, EmbeddingService, byota_mastodon, mo, pd, pickle, time):
                 # print(f"{id}: {soup.get_text()}")
                 compact_data.append((id, soup.get_text()))
         return compact_data
-
     return (
         build_cache_dataframes,
         build_cache_embeddings,

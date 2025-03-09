@@ -1,6 +1,7 @@
 from scipy import spatial
 import numpy as np
 from byota.embeddings import EmbeddingService
+from loguru import logger
 
 # -- Similarity --------------------------------------------------------------
 
@@ -33,6 +34,10 @@ class SearchService:
         """Given a query (whether as an integer index to a status or plain
         text), return the k indices of the most similar embeddings.
         """
+        if k>len(self._embeddings):
+            logger.warning("The number of neighbors k is greater than the number of samples. Setting k=num_samples")
+            k=len(self._embeddings)
+
         q = self.prepare_query(query)
 
         # get the k nearest neighbors' indices
