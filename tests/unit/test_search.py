@@ -3,14 +3,17 @@ from byota.search import SearchService
 from scipy.spatial import distance_matrix
 from loguru import logger
 
+
 def test_search():
-    embeddings = np.array([ 
-        [1,0,0,0],
-        [0,1,0,0],
-        [0,0,2,0],
-        [0,0,0,3],
-        [1,1,0,0],
-    ]).astype(np.float32)
+    embeddings = np.array(
+        [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 2, 0],
+            [0, 0, 0, 3],
+            [1, 1, 0, 0],
+        ]
+    ).astype(np.float32)
 
     # as our query will be and index, we do not need an embedding service so we pass None
     search_service = SearchService(embeddings, None)

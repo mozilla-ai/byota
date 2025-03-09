@@ -36,6 +36,7 @@ def _():
     )
     import byota.mastodon as byota_mastodon
     from byota.search import SearchService
+
     return (
         BeautifulSoup,
         EmbeddingService,
@@ -564,6 +565,7 @@ def _(mo):
                 return True
 
         return False
+
     return configuration_form, invalid_form, timelines_dict
 
 
@@ -723,6 +725,7 @@ def _(BeautifulSoup, EmbeddingService, byota_mastodon, mo, pd, pickle, time):
                 # print(f"{id}: {soup.get_text()}")
                 compact_data.append((id, soup.get_text()))
         return compact_data
+
     return (
         build_cache_dataframes,
         build_cache_embeddings,
