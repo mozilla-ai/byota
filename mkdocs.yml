@@ -1,6 +1,6 @@
 site_name: Guidance Docs
-repo_url: https://github.com/mozilla-ai/blueprint-template
-repo_name: blueprint-template
+repo_url: https://github.com/mozilla-ai/byota
+repo_name: byota
 
 nav:
   - Home: index.md
