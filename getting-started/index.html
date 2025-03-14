@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../images/Blueprint-logo-black-flavicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.7">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.8">
     
     
       
@@ -320,24 +320,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#byota-demo" class="md-nav__link">
+  <a href="#byota-demo-running-on-synthetic-data" class="md-nav__link">
     <span class="md-ellipsis">
-      BYOTA Demo
+      BYOTA demo (running on synthetic data)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-byota-in-a-container" class="md-nav__link">
+  <a href="#byota-running-on-real-data" class="md-nav__link">
     <span class="md-ellipsis">
-      Running BYOTA in a container
+      BYOTA (running on real data)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BYOTA (running on real data)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generating-mastodon-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      Generating Mastodon credentials
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
+  <a href="#running-byota-as-a-docker-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running BYOTA as a Docker container
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#running-byota-into-your-system" class="md-nav__link">
     <span class="md-ellipsis">
       Running BYOTA into your system
@@ -354,13 +373,12 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Running a local embedding server">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
-  <a href="#running-the-notebook" class="md-nav__link">
+  <a href="#running-the-marimo-notebook-in-edit-mode" class="md-nav__link">
     <span class="md-ellipsis">
-      Running the notebook
+      Running the marimo notebook in edit mode
     </span>
   </a>
   
@@ -495,24 +513,43 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#byota-demo" class="md-nav__link">
+  <a href="#byota-demo-running-on-synthetic-data" class="md-nav__link">
     <span class="md-ellipsis">
-      BYOTA Demo
+      BYOTA demo (running on synthetic data)
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#running-byota-in-a-container" class="md-nav__link">
+  <a href="#byota-running-on-real-data" class="md-nav__link">
     <span class="md-ellipsis">
-      Running BYOTA in a container
+      BYOTA (running on real data)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="BYOTA (running on real data)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#generating-mastodon-credentials" class="md-nav__link">
+    <span class="md-ellipsis">
+      Generating Mastodon credentials
     </span>
   </a>
   
 </li>
-      
-        <li class="md-nav__item">
+        
+          <li class="md-nav__item">
+  <a href="#running-byota-as-a-docker-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Running BYOTA as a Docker container
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#running-byota-into-your-system" class="md-nav__link">
     <span class="md-ellipsis">
       Running BYOTA into your system
@@ -529,13 +566,12 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Running a local embedding server">
-      <ul class="md-nav__list">
+</li>
         
           <li class="md-nav__item">
-  <a href="#running-the-notebook" class="md-nav__link">
+  <a href="#running-the-marimo-notebook-in-edit-mode" class="md-nav__link">
     <span class="md-ellipsis">
-      Running the notebook
+      Running the marimo notebook in edit mode
     </span>
   </a>
   
@@ -571,15 +607,57 @@
 
 
 <h1 id="getting-started-with-byota">Getting Started With BYOTA</h1>
-<p>You can run BYOTA in two different ways: as a Docker container or by installing its components into your system.</p>
-<h2 id="byota-demo">BYOTA Demo</h2>
-<h2 id="running-byota-in-a-container">Running BYOTA in a container</h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a> docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota
+<p>You can run BYOTA in a few different ways: </p>
+<ul>
+<li>as a demo, showcasing its features on synthetic data</li>
+<li>as a self-contained Docker image running on your computer</li>
+<li>as a set of applications you manually deploy on your system</li>
+</ul>
+<p>These options are sorted by difficulty (the simplest one start with a single click!) but also by amount of control you have on the whole system. The following sections will explain these options in detail, so you can find the one that works best for you.</p>
+<h2 id="byota-demo-running-on-synthetic-data">BYOTA demo (running on synthetic data)</h2>
+<p>The BYOTA demo is a <a href="https://marimo.io/">marimo</a> application that allows you to experiment with BYOTA's features using synthetic data. You can run it in one of the following ways:</p>
+<ul>
+<li>one-click access to HuggingFace spaces:</li>
+<li><a href="https://huggingface.co/spaces/mozilla-ai/byota"><img alt="Try on Spaces" src="https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue" /></a>  (👉 make sure link is ok)</li>
+<li>locally with Docker:</li>
+<li><code>docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota demo.py</code></li>
+<li>open a browser and connect to http://localhost:2718</li>
+</ul>
+<h2 id="byota-running-on-real-data">BYOTA (running on real data)</h2>
+<p>The BYOTA application runs on real data, i.e. data downloaded from your Mastodon account. For this to work, you first need to generate some credentials for the application, then run BYOTA either as a Docker container or as a set of applications deployed in your system.</p>
+<h3 id="generating-mastodon-credentials">Generating Mastodon credentials</h3>
+<ol>
+<li>Connect to https://<your_mastodon_instance>/settings/applications (log in if needed)</li>
+<li>Click on the <code>New application</code> button</li>
+<li>Enter a name for your application (e.g. <code>BYOTA</code>)</li>
+<li>Leave the Redirect URI as it is (<code>urn:ietf:wg:oauth:2.0:oob</code>)</li>
+<li>In the <code>Scopes</code> section, check the <code>Read</code> checkbox (you can uncheck <code>Profile</code> if you want)</li>
+<li>Click the <code>Submit</code> button at the end of the page</li>
+</ol>
+<p><img alt="alt text" src="../images/mastodon_credentials.png" /></p>
+<p>After this, your new application will appear in the applications page. If you click on its name, you will be able to see the application credentials including its client key, client secret, and access token. </p>
+<p>The two pieces of information you will need to pass BYOTA to access your account are this token (which we will refer to as <code>MASTODON_ACCESS_TOKEN</code> from now on) and the API base URL of your Mastodon instance (which in most cases is the instance URL itself, and we call <code>MASTODON_API_BASE_URL</code>).</p>
+<h3 id="running-byota-as-a-docker-container">Running BYOTA as a Docker container</h3>
+<p>Now that you have a registered application and its access token, you can run BYOTA's Docker container as follows:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker run -it -p 8080:8080 -p 2718:2718 -e MASTODON_ACCESS_TOKEN=&quot;&lt;your_access_token&gt;&quot; -e MASTODON_API_BASE_URL=&quot;&lt;your_api_base_url&gt;&quot; mzdotai/byota
 </span></code></pre></div>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a> docker run -it -p 8080:8080 -p 2718:2718 -e MASTODON_ACCESS_TOKEN=&quot;EFPWZSFv7juKq-gqNgdvZYiDuKJMxTGl_kRXwsaYDnY&quot; -e MASTODON_API_BASE_URL=&quot;http://fosstodon.org&quot; mzdotai/byota
+<p>Once the container is up and running, you can open the marimo notebook (which is started by default in <a href="https://docs.marimo.io/guides/apps/">app view</a>) by connecting to http://localhost:2718. You will be asked a password which is, by default, <code>byota</code> (you can customize it in the <code>entrypoint.sh</code> file when you build your own image).</p>
+<blockquote>
+<p><strong>NOTE</strong></p>
+<p>If for any reason you don't want to directly pass your credentials on the command line, you can also run the docker container as follows:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota
 </span></code></pre></div>
-<h2 id="running-byota-into-your-system">Running BYOTA into your system</h2>
-<h3 id="running-a-local-embedding-server">Running a local embedding server</h3>
+<p>... and provide the credentials in a json file called <code>auth.json</code>, formatted like follows:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>{
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  &quot;MASTODON_ACCESS_TOKEN&quot;: &quot;&lt;your_access_token&gt;&quot;,
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  &quot;MASTODON_API_BASE_URL&quot;: &quot;&lt;your_api_base_url&gt;&quot;
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>}
+</span></code></pre></div>
+</blockquote>
+<h3 id="running-byota-into-your-system">Running BYOTA into your system</h3>
+<p>This choice allows you to have the maximum level of customization, i.e. you can edit the notebook code, choose your own embedding server and model, and so on.</p>
+<p>To run BYOTA into your system, you first need to start a local embedding server. Then, you can run the marimo notebook in edit mode. </p>
+<h4 id="running-a-local-embedding-server">Running a local embedding server</h4>
 <p>BYOTA relies on <em>sentence embeddings</em> to internally represent statuses from your Mastodon timeline. You can think about them as numerical descriptors of Mastodon statuses that are closer the more semantically similar two statuses are.</p>
 <p>BYOTA supports both <a href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a> and <a href="https://ollama.com/">ollama</a> as embedding servers:</p>
 <ul>
@@ -595,22 +673,21 @@
 </li>
 </ul>
 <blockquote>
-<p>[!NOTE]
-The default embedding server URL provided in the configuration form is <code>http://localhost:8080/embedding</code> which is llamafile's default.
+<p><strong>NOTE</strong></p>
+<p>The default embedding server URL provided in the configuration form is <code>http://localhost:8080/embedding</code> which is llamafile's default.
 If you have chosen to use ollama instead, at the moment you need to manually provide its default URL which is <code>http://localhost:11434/api/embed</code>.</p>
 </blockquote>
-<h4 id="running-the-notebook">Running the notebook</h4>
+<h4 id="running-the-marimo-notebook-in-edit-mode">Running the marimo notebook in edit mode</h4>
 <ul>
 <li>Set up and activate your favorite python env</li>
 <li>run <code>pip install -r requirements</code></li>
 <li>run <code>marimo edit notebook.py</code></li>
 <li>a browser window will open with the notebooks</li>
 </ul>
-<p>The first time you run the notebook, you will need to create a new client application. You can do this by filling up the registration form with an
-application name and the base URL of your Mastodon instance's API:</p>
-<p><img alt="A form called &quot;App Registration&quot; with two fields called &quot;Application name&quot; and &quot;Mastodon instance API base URL&quot;" src="../images/registration.png" /></p>
-<p>The Configuration section allows you to provide your credentials, choose which timeline(s) you want to download, the embeddings server API you want to use (see details in the previous section), and whether to run in offline mode (in this case statuses won't be downloaded but read from a file).</p>
-<p><img alt="A configuration panel showing the sections &quot;Mastodon Credentials&quot;, &quot;Timelines&quot;, &quot;Embeddings&quot;, and &quot;Caching&quot;" src="../images/configuration.png" /></p>
+<blockquote>
+<p><strong>NOTE</strong></p>
+<p>Remember to make sure your <code>MASTODON_ACCESS_TOKEN</code> and <code>MASTODON_API_BASE_URL</code> are accessible, either by setting them in your env or by creating an <code>auth.json</code> file in the same directory where the notebook runs.</p>
+</blockquote>
 
 
 
