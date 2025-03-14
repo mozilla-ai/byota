@@ -30,7 +30,7 @@ This blueprint introduces an approach to personal, local timeline algorithms tha
 
 📘 To explore this project further and discover other Blueprints, visit the [**Blueprints Hub**](https://developer-hub.mozilla.ai/).
 
- 📖 For more detailed guidance on using this project, please visit our [**Docs here**](https://mozilla-ai.github.io/BYOTA/)
+ 📖 For more detailed guidance on using this project, please visit our [**Docs here**](https://mozilla-ai.github.io/byota/)
 
 ## Built with
 - ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
@@ -42,15 +42,22 @@ This blueprint introduces an approach to personal, local timeline algorithms tha
 
 - [Talk @ FOSDEM 2025](https://video.fosdem.org/2025/ud2208/fosdem-2025-5601-build-your-own-timeline-algorithm.mp4)
 
-- 👉 DEMO (Coming soon)
+- 👉 DEMO VIDEO (Coming soon)
 
 
 ## Quick-start
 
-👉 Instructions for the BYOTA docker demo:
-- locally with Docker
-- on HF
+Run the demo (no Mastodon account needed!):
 
+- [![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/byota)  (👉 make sure link is ok)
+- locally with Docker:
+  - `docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota demo.py`
+  - open a browser and connect to http://localhost:2718
+  - when asked a password, enter `byota`
+
+Run on your own timelines (Mastodon credentials required):
+
+- check out the [Getting Started](https://mozilla-ai.github.io/byota/getting-started/) guide
 
 ## How it Works
 BYOTA relies on a stack which makes use of [Mastodon.py](https://github.com/halcy/Mastodon.py) to get recent timeline data, [llamafile](https://github.com/Mozilla-Ocho/llamafile) to calculate post embeddings locally, and [marimo](https://github.com/marimo-team/marimo) to provide a UI that runs in one’s own browser. Using this stack, you can visualize, search, and re-rank posts from the fediverse without any of them leaving your computer.

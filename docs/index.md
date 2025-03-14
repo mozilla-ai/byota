@@ -13,6 +13,8 @@ These docs are your companion to mastering this Blueprint.
 
 ---
 
+👉 MEANS Work In Progress
+
 ### 🚀 **Get Started Quickly**
 #### _Start experimenting with your own timeline:_
 - **[Getting Started](getting-started.md):** Quick setup and installation instructions.
@@ -20,12 +22,14 @@ These docs are your companion to mastering this Blueprint.
 ### 🔍 **Understand the System**
 #### _Dive deeper into how the Blueprint works:_
 - **[Step-by-Step Guide](step-by-step-guide.md):** A detailed breakdown of the system’s design and workflow.
+- 👉 Detail steps within the application
 
 <!-- - **[API Reference](api.md):** Explore the technical details of the core modules. -->
 
 ### 🎨 **Make It Yours**
 #### _Customize the Blueprint to fit your needs:_
 - **[Customization Guide](customization.md):** Tailor the project to fit your needs
+- 👉 explain what can be customized
 
 ### 🌟 **Join the Community**
 #### _Help shape the future of BYOTA:_
