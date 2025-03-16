@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.13"
+__generated_with = "0.11.19"
 app = marimo.App(width="medium")
 
 
@@ -18,41 +18,32 @@ def _():
 def _():
     import marimo as mo
     import pickle
-    import requests
     import time
-    import functools
     import altair as alt
-    from bs4 import BeautifulSoup
     from sklearn.manifold import TSNE
     import pandas as pd
     from pathlib import Path
     import json
     import os
+    import numpy as np
 
-    from byota.embeddings import (
-        EmbeddingService,
-        LLamafileEmbeddingService,
-        OllamaEmbeddingService,
-    )
-    import byota.mastodon as byota_mastodon
+    from byota.embeddings import EmbeddingService, LLamafileEmbeddingService
+
     from byota.search import SearchService
+
     return (
-        BeautifulSoup,
         EmbeddingService,
         LLamafileEmbeddingService,
-        OllamaEmbeddingService,
         Path,
         SearchService,
         TSNE,
         alt,
-        byota_mastodon,
-        functools,
         json,
         mo,
+        np,
         os,
         pd,
         pickle,
-        requests,
         time,
     )
 
@@ -62,78 +53,70 @@ def _():
     # internal variables
 
     # dump files for offline mode
-    paginated_data_file = "dump_paginated_data.pkl"
-    dataframes_data_file = "dump_dataframes.pkl"
-    embeddings_data_file = "dump_embeddings.pkl"
-
-    return dataframes_data_file, embeddings_data_file, paginated_data_file
-
-
-@app.cell
-def _(LLamafileEmbeddingService, mo):
-    embedding_service = LLamafileEmbeddingService("http://localhost:8080/embedding")
-
-    mo.stop(
-        not embedding_service.is_working(),
-        mo.md(
-            f"**Cannot access embedding server.**"
-        ),
-    )
-
-    # collect the names of the timelines we want to download from
-    timelines = ['home']
-
-    # set offline mode
-    offline_mode = True
-
-    # choose what to read from cache
-    cached_timelines = offline_mode
-    cached_dataframes = offline_mode
-    cached_embeddings = offline_mode
-    return (
-        cached_dataframes,
-        cached_embeddings,
-        cached_timelines,
-        embedding_service,
-        offline_mode,
-        timelines,
-    )
+    dataframes_data_file = "data/dump_dataframes_demo.pkl"
+    embeddings_data_file = "data/dump_embeddings_demo.pkl"
+    user_statuses_data_file = "data/dump_user_statuses_demo.pkl"
+    return dataframes_data_file, embeddings_data_file, user_statuses_data_file
 
 
 @app.cell
-def _(mo, timelines):
-    mo.md(f"""
-    ###Downloading paginated data from the following timelines: {", ".join(timelines)}
-    """).center()
+def _(mo):
+    mo.md(
+        """
+        # Build Your Own Timeline Algorithm
+
+        Welcome to BYOTA's demo!
+
+        This small Web application shows some of the things you could do running BYOTA's code on your own timeline.
+        As this is open for anyone to use, this version of the code does not connect to any real social network, but uses either synthetic data (to simulate posts in the home, local, and public timelines) or posts from [my Mastodon account](http://fosstodon.org/@mala).
+
+        If you want to use BYOTA with your own data, feel free to check its [⌨️ code](https://github.com/mozilla-ai/byota)
+        and [📖 documentation](https://mozilla-ai.github.io/byota/).
+
+        So, feel free to just click "submit" in the following Configuration form and... see what happens!
+        """
+    )
+    return
+
+
+@app.cell
+def _(configuration_form):
+    configuration_form
     return
 
 
 @app.cell
 def _(
-    build_cache_dataframes,
-    build_cache_paginated_data,
-    cached_dataframes,
-    cached_timelines,
+    LLamafileEmbeddingService,
+    configuration_form,
     dataframes_data_file,
+    invalid_form,
+    load_dataframes,
     mo,
-    paginated_data_file,
-    timelines,
 ):
-    paginated_data = build_cache_paginated_data(
-        None, timelines, cached_timelines, paginated_data_file
-    )
-    mo.stop(paginated_data is None, mo.md("**Issues getting paginated data**"))
-
-    dataframes = build_cache_dataframes(
-        paginated_data, cached_dataframes, dataframes_data_file
+    mo.stop(
+        invalid_form(configuration_form),
+        mo.md("**Submit the form to continue.**").center(),
     )
 
-    mo.stop(paginated_data is None, mo.md("**Issues building dataframes**"))
-    return dataframes, paginated_data
+    embedding_service = LLamafileEmbeddingService("http://localhost:8080/embedding")
+
+    mo.stop(
+        not embedding_service.is_working(),
+        mo.md("**Cannot access embedding server.**"),
+    )
+
+    # choose what to read from cache
+    cached_embeddings = configuration_form.value["offline_mode"]
+
+    dataframes = load_dataframes(dataframes_data_file)
+    mo.stop(dataframes is None, mo.md("**Issues loading dataframes**"))
+    return cached_embeddings, dataframes, embedding_service
 
 
 @app.cell
 def _(dataframes, mo):
+    mo.stop(dataframes is None)
     mo.md(f"""
     ### Calculating embeddings for the downloaded timeline{"s" if len(dataframes.keys())>1 else ""}.
     """).center()
@@ -158,9 +141,7 @@ def _(
 
 
 @app.cell
-def _(TSNE, alt, dataframes, embeddings, mo, pd):
-    import numpy as np
-
+def _(TSNE, alt, dataframes, embeddings, mo, np, pd):
     def tsne(dataframes, embeddings, perplexity, random_state=42):
         """Runs dimensionality reduction using TSNE on the input embeddings.
         Returns dataframes containing status id, text, and 2D coordinates
@@ -185,20 +166,28 @@ def _(TSNE, alt, dataframes, embeddings, mo, pd):
 
         return pd.concat(dfs, ignore_index=True), all_embeddings
 
-    df_, all_embeddings = tsne(dataframes, embeddings, perplexity=16)
+    df_, all_embeddings = tsne(dataframes, embeddings, perplexity=4)
 
     chart = mo.ui.altair_chart(
         alt.Chart(df_, title="Timeline Visualization", height=500)
         .mark_point()
         .encode(x="x", y="y", color="label")
     )
-    return all_embeddings, chart, df_, np, tsne
+    return all_embeddings, chart, df_, tsne
 
 
 @app.cell
 def _(chart, mo):
     mo.vstack(
         [
+            mo.md("# Embeddings visualization").center(),
+            mo.md("""
+                In this section, you can see posts from different timelines represented as points on a plane:
+                You can click on a timeline label on the top right to highlight only posts from that timeline.
+                If you select one or more points, you will see them in the table below the plot.
+                By clicking on the column names (e.g. `label`, `text`) you can sort them, wrap text (to see full
+                post contents), or search their content.
+            """),
             chart,
             chart.value[["id", "label", "text"]]
             if len(chart.value) > 0
@@ -212,7 +201,23 @@ def _(chart, mo):
 def _(embeddings, mo, query_form):
     mo.stop(embeddings is None)
 
-    mo.vstack([mo.md("# Timeline search"), query_form])
+    mo.vstack(
+        [
+            mo.md("# Timeline search"),
+            mo.md("""
+            Here you can search for the most similar posts to a given one.
+            You can either provide a row id (the leftmost column in the previous table) to refer to an existing post,
+            or freeform text to look for posts which are similar in content to what you wrote. Some examples:
+
+            - Book suggestions for scifi lovers
+            - Digital rights and free software
+            - Recipes for vegetarians (warning: sadly you won't get recipes from this dataset!)
+            - I like retrocomputing but also bouldering, now what?
+
+        """),
+            query_form,
+        ]
+    )
     return
 
 
@@ -227,23 +232,48 @@ def _(SearchService, all_embeddings, df_, embedding_service, query_form):
 @app.cell
 def _(embeddings, mo, rerank_form):
     mo.stop(embeddings is None)
-    rerank_form
+
+    mo.vstack(
+        [
+            mo.md("# Timeline Re-ranking"),
+            mo.md("""
+        In the previous sections, you saw that embeddings are reasonable descriptors for social media posts,
+        as they allow semantic similar statuses to be close in the embedding space. This allows you to use
+        the simple concept of *distance between points* to group statuses and search them.
+
+        In section, we are going to perform actual timeline re-ranking. To do this, we'll still rely on the
+        concept of text similarity, assigning a higher score to those posts which are most similar to *a set
+        of other posts*. The set we choose to consider as a reference is the one of the posts you wrote or
+        reposted from others.
+
+        For the sake of this open demo, the posts are not the ones *you* wrote, but I provided a subset of
+        those posted by https://fosstodon.org/@mala (that's me!). This way, you can get a better sense of
+        how this would work with some real data rather than a fully synthetic dataset.
+
+        Inside "Your statuses" you will be able to see my posts and get a general idea about the things
+        I write the most about. You can choose how many statuses are used for re-ranking (1 page = 20 posts)
+        and see how results differ depending on what contents you include.
+
+        Inside "Your re-ranked timeline", you will see posts from the synthetic timelines (you can choose
+        between home, local, and public), re-ranked to prioritize those topics I write the most about.
+        """),
+            rerank_form,
+        ]
+    )
     return
 
 
 @app.cell
 def _(
-    byota_mastodon,
     dataframes,
     embedding_service,
     embeddings,
-    get_compact_data,
-    mastodon_client,
+    load_dataframes,
     mo,
     np,
-    pd,
     rerank_form,
     time,
+    user_statuses_data_file,
 ):
     mo.stop(embeddings is None)
 
@@ -252,15 +282,12 @@ def _(
 
     timeline_to_rerank = rerank_form.value["timeline_to_rerank"]
 
-    # download and calculate embeddings of user statuses
-    user_statuses = byota_mastodon.get_paginated_statuses(
-        mastodon_client,
-        max_pages=rerank_form.value["num_user_status_pages"],
-        exclude_reblogs=rerank_form.value["exclude_reblogs"],
-    )
-    user_statuses_df = pd.DataFrame(
-        get_compact_data(user_statuses), columns=["id", "text"]
-    )
+    user_statuses_df = load_dataframes(user_statuses_data_file)[
+        : 20 * rerank_form.value["num_user_status_pages"]
+    ]
+
+    mo.stop(user_statuses_df is None, mo.md("**Issues loading dataframes**"))
+
     user_statuses_embeddings = embedding_service.calculate_embeddings(
         user_statuses_df["text"]
     )
@@ -302,7 +329,6 @@ def _(
         idx,
         rerank_start_time,
         timeline_to_rerank,
-        user_statuses,
         user_statuses_df,
         user_statuses_embeddings,
     )
@@ -353,6 +379,17 @@ def _(mo, rerank_form, tag_form):
         Feel free to test the following code with different tags, depending on your
         various interests, and see whether your own posts related to a given interest
         are surfaced by a related tag.
+
+        **NOTE: a couple of changes have been applied for the sake of having a functional demo:**
+
+        1. Posts are not actually your own (see above).
+
+        2. The word(s) that you enter below will be used to filter the existing posts in the
+        (synthetic) public timeline, rather than running a new tag search on the mastodon server.
+        This allows you to still get meaningful posts back without having to connect to an instance.
+
+        Some example search terms you could use: `#AI`, `bouldering`, `books`, `scifi`, `retrogaming`, `movies`.
+        If a search term is not found, you will simply see no results.
         """),
             tag_form,
         ]
@@ -362,52 +399,30 @@ def _(mo, rerank_form, tag_form):
 
 @app.cell
 def _(
-    byota_mastodon,
+    dataframes,
     embedding_service,
-    get_compact_data,
-    mastodon_client,
     mo,
-    pd,
-    rerank_form,
-):
-    mo.stop(rerank_form.value is None)
-
-    my_posts = byota_mastodon.get_paginated_statuses(
-        mastodon_client, max_pages=10, exclude_reblogs=True, exclude_replies=True
-    )
-    my_posts_df = pd.DataFrame(get_compact_data(my_posts), columns=["id", "text"])
-    my_posts_embeddings = embedding_service.calculate_embeddings(my_posts_df["text"])
-    return my_posts, my_posts_df, my_posts_embeddings
-
-
-@app.cell
-def _(
-    byota_mastodon,
-    embedding_service,
-    get_compact_data,
-    mastodon_client,
-    mo,
-    my_posts_df,
-    my_posts_embeddings,
     np,
-    pd,
     tag_form,
+    user_statuses_df,
+    user_statuses_embeddings,
 ):
-    tag_name = f"tag/{tag_form.value}"
+    tag_name = tag_form.value
 
-    tag_posts = byota_mastodon.get_paginated_data(
-        mastodon_client, tag_name, max_pages=1
-    )
-    tag_posts_df = pd.DataFrame(get_compact_data(tag_posts), columns=["id", "text"])
+    tag_posts_df = dataframes["public"][
+        dataframes["public"]["text"].str.contains(tag_name)
+    ]
     tag_posts_embeddings = embedding_service.calculate_embeddings(tag_posts_df["text"])
 
     # calculate the re-ranking index
     my_idx = np.flip(
-        np.argsort(np.sum(np.dot(tag_posts_embeddings, my_posts_embeddings.T), axis=0))
+        np.argsort(
+            np.sum(np.dot(tag_posts_embeddings, user_statuses_embeddings.T), axis=0)
+        )
     )
     # let us also show the similarity scores used to calculate the index
-    my_posts_df["scores"] = np.sum(
-        np.dot(tag_posts_embeddings, my_posts_embeddings.T), axis=0
+    user_statuses_df["scores"] = np.sum(
+        np.dot(tag_posts_embeddings, user_statuses_embeddings.T), axis=0
     )
 
     mo.vstack(
@@ -415,11 +430,11 @@ def _(
             mo.md(
                 f"### Your own posts, re-ranked according to their similarity to posts in {tag_name}"
             ),
-            my_posts_df.iloc[my_idx][["text", "scores"]],
+            user_statuses_df.iloc[my_idx][["text", "scores"]],
         ]
     )
     # my_posts_df[['text', 'scores']]
-    return my_idx, tag_name, tag_posts, tag_posts_df, tag_posts_embeddings
+    return my_idx, tag_name, tag_posts_df, tag_posts_embeddings
 
 
 @app.cell
@@ -430,6 +445,7 @@ def _(mo):
         mo.md(
             """
         # Configuration
+        (NOTE: settings will be ignored in this demo, data will be loaded from a file)
 
         **Timelines**
 
@@ -452,8 +468,8 @@ def _(mo):
         )
         .batch(
             tl_home=mo.ui.checkbox(label="Home", value=True),
-            tl_local=mo.ui.checkbox(label="Local"),
-            tl_public=mo.ui.checkbox(label="Public"),
+            tl_local=mo.ui.checkbox(label="Local", value=True),
+            tl_public=mo.ui.checkbox(label="Public", value=True),
             tl_hashtag=mo.ui.checkbox(label="Hashtag"),
             tl_list=mo.ui.checkbox(label="List"),
             tl_hashtag_txt=mo.ui.text(),
@@ -498,6 +514,7 @@ def _(mo):
                 return True
 
         return False
+
     return configuration_form, invalid_form, timelines_dict
 
 
@@ -507,8 +524,10 @@ def _(mo):
     rerank_form = (
         mo.md(
             """
-        # Timeline re-ranking
-        **User statuses**
+        # Re-ranking settings
+
+        **User statuses** (NOTE: data will be loaded from a file)
+
 
         {num_user_status_pages}    {exclude_reblogs}
 
@@ -522,9 +541,9 @@ def _(mo):
                 start=1, stop=20, label="Number of pages to load", value=1
             ),
             timeline_to_rerank=mo.ui.radio(
-                options=["home", "local", "public"], value="home"
+                options=["home", "local", "public"], value="public"
             ),
-            exclude_reblogs=mo.ui.checkbox(label="Exclude reblogs"),
+            exclude_reblogs=mo.ui.checkbox(label="Exclude reblogs", value=True),
         )
         .form(show_clear_button=True, bordered=True)
     )
@@ -544,66 +563,22 @@ def _(mo):
 @app.cell
 def _(mo):
     tag_form = mo.ui.text(
-        value="gopher",
+        value="retrogaming",
         label="Enter a tag name:\n",
     )
     return (tag_form,)
 
 
 @app.cell
-def _(BeautifulSoup, EmbeddingService, byota_mastodon, mo, pd, pickle, time):
-    def build_cache_paginated_data(
-        mastodon_client, timelines: list, cached: bool, paginated_data_file: str
-    ) -> dict[str, any]:
-        """Given a list of timeline names and a mastodon client,
-        use the mastodon client to get paginated data from each
-        and return a dictionary that contains, for each key, all
-        the retrieved data.
-        If cached==True, the `paginated_data_file` file will be loaded.
-        """
-        if not cached:
-            paginated_data = {}
-            for tl in timelines:
-                paginated_data[tl] = byota_mastodon.get_paginated_data(
-                    mastodon_client, tl
-                )
-            with open(paginated_data_file, "wb") as f:
-                pickle.dump(paginated_data, f)
-
-        else:
-            print(f"Loading cached paginated data from {paginated_data_file}")
-            try:
-                with open(paginated_data_file, "rb") as f:
-                    paginated_data = pickle.load(f)
-            except FileNotFoundError:
-                print(f"File {paginated_data_file} not found.")
-                return None
-        return paginated_data
-
-    def build_cache_dataframes(
-        paginated_data: dict[str, any], cached: bool, dataframes_data_file: str
-    ) -> dict[str, any]:
-        """Given a dictionary with paginated data from different timelines,
-        return another dictionary that contains, for each timeline, a compact
-        pandas DataFrame of (id, text) pairs.
-        If cached==True, the `dataframes_data_file` file will be loaded.
-        """
-        if not cached:
-            dataframes = {}
-            for k in paginated_data:
-                dataframes[k] = pd.DataFrame(
-                    get_compact_data(paginated_data[k]), columns=["id", "text"]
-                )
-            with open(dataframes_data_file, "wb") as f:
-                pickle.dump(dataframes, f)
-        else:
-            print(f"Loading cached dataframes from {dataframes_data_file}")
-            try:
-                with open(dataframes_data_file, "rb") as f:
-                    dataframes = pickle.load(f)
-            except FileNotFoundError:
-                print(f"File {dataframes_data_file} not found.")
-                return None
+def _(BeautifulSoup, EmbeddingService, mo, pickle, time):
+    def load_dataframes(data_file):
+        dataframes = None
+        print(f"Loading cached dataframes from {data_file}")
+        try:
+            with open(data_file, "rb") as f:
+                dataframes = pickle.load(f)
+        except FileNotFoundError:
+            print(f"File {data_file} not found.")
 
         return dataframes
 
@@ -657,12 +632,8 @@ def _(BeautifulSoup, EmbeddingService, byota_mastodon, mo, pd, pickle, time):
                 # print(f"{id}: {soup.get_text()}")
                 compact_data.append((id, soup.get_text()))
         return compact_data
-    return (
-        build_cache_dataframes,
-        build_cache_embeddings,
-        build_cache_paginated_data,
-        get_compact_data,
-    )
+
+    return build_cache_embeddings, get_compact_data, load_dataframes
 
 
 @app.cell
