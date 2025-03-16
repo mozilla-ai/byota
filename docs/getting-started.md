@@ -1,6 +1,6 @@
 # Getting Started With BYOTA
 
-You can run BYOTA in a few different ways: 
+You can run BYOTA in a few different ways:
 
 - as a demo, showcasing its features on synthetic data
 - as a self-contained Docker image running on your computer
@@ -34,7 +34,7 @@ The BYOTA application runs on real data, i.e. data downloaded from your Mastodon
 
 ![alt text](images/mastodon_credentials.png)
 
-After this, your new application will appear in the applications page. If you click on its name, you will be able to see the application credentials including its client key, client secret, and access token. 
+After this, your new application will appear in the applications page. If you click on its name, you will be able to see the application credentials including its client key, client secret, and access token.
 
 The two pieces of information you will need to pass BYOTA to access your account are this token (which we will refer to as `MASTODON_ACCESS_TOKEN` from now on) and the API base URL of your Mastodon instance (which in most cases is the instance URL itself, and we call `MASTODON_API_BASE_URL`).
 
@@ -70,7 +70,7 @@ Once the container is up and running, you can open the marimo notebook (which is
 
 This choice allows you to have the maximum level of customization, i.e. you can edit the notebook code, choose your own embedding server and model, and so on.
 
-To run BYOTA into your system, you first need to start a local embedding server. Then, you can run the marimo notebook in edit mode. 
+To run BYOTA into your system, you first need to start a local embedding server. Then, you can run the marimo notebook in edit mode.
 
 #### Running a local embedding server
 
