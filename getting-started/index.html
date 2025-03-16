@@ -607,7 +607,7 @@
 
 
 <h1 id="getting-started-with-byota">Getting Started With BYOTA</h1>
-<p>You can run BYOTA in a few different ways: </p>
+<p>You can run BYOTA in a few different ways:</p>
 <ul>
 <li>as a demo, showcasing its features on synthetic data</li>
 <li>as a self-contained Docker image running on your computer</li>
@@ -635,7 +635,7 @@
 <li>Click the <code>Submit</code> button at the end of the page</li>
 </ol>
 <p><img alt="alt text" src="../images/mastodon_credentials.png" /></p>
-<p>After this, your new application will appear in the applications page. If you click on its name, you will be able to see the application credentials including its client key, client secret, and access token. </p>
+<p>After this, your new application will appear in the applications page. If you click on its name, you will be able to see the application credentials including its client key, client secret, and access token.</p>
 <p>The two pieces of information you will need to pass BYOTA to access your account are this token (which we will refer to as <code>MASTODON_ACCESS_TOKEN</code> from now on) and the API base URL of your Mastodon instance (which in most cases is the instance URL itself, and we call <code>MASTODON_API_BASE_URL</code>).</p>
 <h3 id="running-byota-as-a-docker-container">Running BYOTA as a Docker container</h3>
 <p>Now that you have a registered application and its access token, you can run BYOTA's Docker container as follows:</p>
@@ -656,7 +656,7 @@
 </blockquote>
 <h3 id="running-byota-into-your-system">Running BYOTA into your system</h3>
 <p>This choice allows you to have the maximum level of customization, i.e. you can edit the notebook code, choose your own embedding server and model, and so on.</p>
-<p>To run BYOTA into your system, you first need to start a local embedding server. Then, you can run the marimo notebook in edit mode. </p>
+<p>To run BYOTA into your system, you first need to start a local embedding server. Then, you can run the marimo notebook in edit mode.</p>
 <h4 id="running-a-local-embedding-server">Running a local embedding server</h4>
 <p>BYOTA relies on <em>sentence embeddings</em> to internally represent statuses from your Mastodon timeline. You can think about them as numerical descriptors of Mastodon statuses that are closer the more semantically similar two statuses are.</p>
 <p>BYOTA supports both <a href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a> and <a href="https://ollama.com/">ollama</a> as embedding servers:</p>
