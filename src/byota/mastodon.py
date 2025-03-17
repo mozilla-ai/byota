@@ -54,7 +54,6 @@ def get_paginated_data(
                 print("No more pages available.")
                 break
 
-
     return paginated_data
 
 
