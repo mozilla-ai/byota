@@ -9,14 +9,29 @@
   </picture>
 </p>
 
-# Build Your Own Timeline Algorithm
 
-[![](https://dcbadge.limes.pink/api/server/YuMNeuKStr?style=flat)](https://discord.gg/YuMNeuKStr)
+<div align="center">
+
+![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
+[![Mastodon.py](https://img.shields.io/badge/Mastodon.py-0066CC?logo=mastodon&logoColor=white)](https://github.com/halcy/Mastodon.py)
+[![Llamafile](https://img.shields.io/badge/Llamafile-6E6E6E?logo=mozilla&logoColor=white&labelColor=4A4A4A)](https://github.com/Mozilla-Ocho/llamafile)
+[![Marimo](https://img.shields.io/badge/Marimo-009688?)](https://github.com/marimo-team/marimo)
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![](https://dcbadge.limes.pink/api/server/YuMNeuKStr?style=flat)](https://discord.gg/YuMNeuKStr) <br>
 [![Docs](https://github.com/mozilla-ai/byota/actions/workflows/docs.yaml/badge.svg)](https://github.com/mozilla-ai/byota/actions/workflows/docs.yaml/)
 [![Tests](https://github.com/mozilla-ai/byota/actions/workflows/tests.yaml/badge.svg)](https://github.com/mozilla-ai/byota/actions/workflows/tests.yaml/)
 [![Ruff](https://github.com/mozilla-ai/byota/actions/workflows/lint.yaml/badge.svg?label=Ruff)](https://github.com/mozilla-ai/byota/actions/workflows/lint.yaml/)
 
+[Blueprints Hub](https://developer-hub.mozilla.ai/)
+| [Talk @ FOSDEM 2025](https://video.fosdem.org/2025/ud2208/fosdem-2025-5601-build-your-own-timeline-algorithm.mp4)
+| [Documentation](https://mozilla-ai.github.io/byota/)
+| [Getting Started](https://mozilla-ai.github.io/byota/getting-started)
+| [Step-by-step Guide](https://mozilla-ai.github.io/byota/step-by-step-guide)
+| [Contributing](CONTRIBUTING.md)
 
+</div>
+
+# Build Your Own Timeline Algorithm
 
 👉 MEANS Work In Progress
 
@@ -26,24 +41,6 @@ This blueprint introduces an approach to personal, local timeline algorithms tha
 
 ![A 2D scatterplot representing statuses from different Mastodon timelines (home, local, public, and tag/gopher). Some areas of the plot are labeled as geographical places in a map (e.g. "The AI peninsula", "The Billionaiers swamp", etc.)](images/map.png)
 *A 2D map of multiple timelines created with BYOTA (labels have been manually added).*
-
-
-📘 To explore this project further and discover other Blueprints, visit the [**Blueprints Hub**](https://developer-hub.mozilla.ai/).
-
- 📖 For more detailed guidance on using this project, please visit our [**Docs here**](https://mozilla-ai.github.io/byota/)
-
-## Built with
-- ![Python](https://img.shields.io/badge/Python-3.11%2B-blue)
-- [Mastodon.py](https://github.com/halcy/Mastodon.py)
-- [Llamafile](https://github.com/Mozilla-Ocho/llamafile)
-- [Marimo](https://github.com/marimo-team/marimo)
-
-## See it in action
-
-- [Talk @ FOSDEM 2025](https://video.fosdem.org/2025/ud2208/fosdem-2025-5601-build-your-own-timeline-algorithm.mp4)
-
-- 👉 DEMO VIDEO (Coming soon)
-
 
 ## Quick-start
 
