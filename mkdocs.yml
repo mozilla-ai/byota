@@ -7,7 +7,6 @@ nav:
   - Getting Started: getting-started.md
   - Step-by-Step Guide: step-by-step-guide.md
   - Customization Guide: customization.md
-  - API Reference: api.md
   - Future Features & Contributions: future-features-contributions.md
 
 theme:
