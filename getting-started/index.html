@@ -367,18 +367,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#running-a-local-embedding-server" class="md-nav__link">
+  <a href="#step-1-running-a-local-embedding-server" class="md-nav__link">
     <span class="md-ellipsis">
-      Running a local embedding server
+      Step 1: Running a local embedding server
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#running-the-marimo-notebook-in-edit-mode" class="md-nav__link">
+  <a href="#step-2-running-the-marimo-notebook-in-edit-mode" class="md-nav__link">
     <span class="md-ellipsis">
-      Running the marimo notebook in edit mode
+      Step 2: Running the marimo notebook in edit mode
     </span>
   </a>
   
@@ -539,18 +539,18 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#running-a-local-embedding-server" class="md-nav__link">
+  <a href="#step-1-running-a-local-embedding-server" class="md-nav__link">
     <span class="md-ellipsis">
-      Running a local embedding server
+      Step 1: Running a local embedding server
     </span>
   </a>
   
 </li>
         
           <li class="md-nav__item">
-  <a href="#running-the-marimo-notebook-in-edit-mode" class="md-nav__link">
+  <a href="#step-2-running-the-marimo-notebook-in-edit-mode" class="md-nav__link">
     <span class="md-ellipsis">
-      Running the marimo notebook in edit mode
+      Step 2: Running the marimo notebook in edit mode
     </span>
   </a>
   
@@ -636,17 +636,17 @@
 <h3 id="running-byota-into-your-system">Running BYOTA into your system</h3>
 <p>This choice allows you to have the maximum level of customization, i.e. you can edit the notebook code, choose your own embedding server and model, and so on.</p>
 <p>To run BYOTA into your system, you first need to start a local embedding server. Then, you can run the marimo notebook in edit mode.</p>
-<h4 id="running-a-local-embedding-server">Running a local embedding server</h4>
+<h4 id="step-1-running-a-local-embedding-server">Step 1: Running a local embedding server</h4>
 <p>BYOTA relies on <em>sentence embeddings</em> to internally represent statuses from your Mastodon timeline. You can think about them as numerical descriptors of Mastodon statuses that are closer the more semantically similar two statuses are.</p>
-<p>BYOTA supports both <a href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a> and <a href="https://ollama.com/">ollama</a> as embedding servers:</p>
+<p>BYOTA supports both <a href="https://github.com/Mozilla-Ocho/llamafile">llamafile</a> and <a href="https://ollama.com/">ollama</a> as embedding servers. Choose one of the following options:</p>
 <ul>
 <li>
-<p>to install a llamafile embedding server, follow the instructions you find
+<p><strong>Option A - Llamafile</strong>: to install a llamafile embedding server, follow the instructions you find
   <a href="https://github.com/Mozilla-Ocho/llamafile/blob/main/llamafile/server/doc/getting_started.md">here</a>:
   the <code>all-MiniLM-L6-v2</code> model cited there works perfectly with the current version of BYOTA, but you can also try others you can find in the <em>Text Embedding Models</em> section <a href="https://github.com/Mozilla-Ocho/llamafile/">here</a>.</p>
 </li>
 <li>
-<p>to install ollama and the <code>all-MiniLM</code> model, first download the executable for your OS from <a href="https://ollama.com/">here</a>,
+<p><strong>Option B - Ollama</strong>: to install ollama and the <code>all-MiniLM</code> model, first download the executable for your OS from <a href="https://ollama.com/">here</a>,
   then install the model with the command <code>ollama pull all-minilm</code>. If you are curious to try more models,
   you can check the list of embedding models available <a href="https://ollama.com/search?c=embedding">here</a>.</p>
 </li>
@@ -656,10 +656,11 @@
 <p>The default embedding server URL provided in the configuration form is <code>http://localhost:8080/embedding</code> which is llamafile's default.
 If you have chosen to use ollama instead, at the moment you need to manually provide its default URL which is <code>http://localhost:11434/api/embed</code>.</p>
 </blockquote>
-<h4 id="running-the-marimo-notebook-in-edit-mode">Running the marimo notebook in edit mode</h4>
+<h4 id="step-2-running-the-marimo-notebook-in-edit-mode">Step 2: Running the marimo notebook in edit mode</h4>
 <ul>
 <li>Set up and activate your favorite python env</li>
-<li>run <code>pip install -r requirements</code></li>
+<li>run <code>pip install -r requirements.txt</code></li>
+<li>run <code>cd src</code></li>
 <li>run <code>marimo edit notebook.py</code></li>
 <li>a browser window will open with the notebooks</li>
 </ul>
