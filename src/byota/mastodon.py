@@ -46,9 +46,14 @@ def get_paginated_data(
             if len(tl) > 0:
                 paginated_data.append(tl)
 
-            max_id = tl._pagination_next.get("max_id")
             bar.update()
             i += 1
+            if hasattr(tl, "_pagination_next") and tl._pagination_next is not None:
+                max_id = tl._pagination_next.get("max_id")
+            else:
+                print("No more pages available.")
+                break
+
     return paginated_data
 
 
