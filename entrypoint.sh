@@ -11,4 +11,4 @@ head /tmp/llamafiler.logs
 
 # Start marimo
 # cd byota/src && marimo run --headless --host 0.0.0.0 --token --token-password byota $1
-cd byota/src && marimo run --headless --host 0.0.0.0 $1
+cd byota/src && marimo run --headless --host 0.0.0.0 demo.py
