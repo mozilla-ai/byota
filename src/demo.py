@@ -30,6 +30,7 @@ def _():
     from byota.embeddings import EmbeddingService, LLamafileEmbeddingService
 
     from byota.search import SearchService
+
     return (
         EmbeddingService,
         LLamafileEmbeddingService,
@@ -308,20 +309,22 @@ def _(
     print(time.time() - rerank_start_time)
 
     # show everything
-    mo.vstack([
-        mo.md("""## Your statuses:
+    mo.vstack(
+        [
+            mo.md("""## Your statuses:
     This table shows the content of the posts that are used for re-ranking the timeline. You can change
     their number in the form above (1 page = 20 posts), check them out here, and verify in the table below
     this one how ranking changes depending on the contents you include.
     """),
-        user_statuses_df,
-        mo.md("""## Your re-ranked timeline:
+            user_statuses_df,
+            mo.md("""## Your re-ranked timeline:
     This table shows posts from the synthetic timelines (you can choose between home, local, and public
     in the form above), re-ranked to prioritize the main topics inferred from the posts in the previous table.
     """),
-        # show statuses sorted by idx
-        dataframes[timeline_to_rerank].iloc[idx][["label", "text"]],
-    ])
+            # show statuses sorted by idx
+            dataframes[timeline_to_rerank].iloc[idx][["label", "text"]],
+        ]
+    )
     return (
         idx,
         rerank_start_time,
@@ -511,6 +514,7 @@ def _(mo):
                 return True
 
         return False
+
     return configuration_form, invalid_form, timelines_dict
 
 
@@ -628,6 +632,7 @@ def _(BeautifulSoup, EmbeddingService, mo, pickle, time):
                 # print(f"{id}: {soup.get_text()}")
                 compact_data.append((id, soup.get_text()))
         return compact_data
+
     return build_cache_embeddings, get_compact_data, load_dataframes
 
 
