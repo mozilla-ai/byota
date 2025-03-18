@@ -36,7 +36,8 @@ The BYOTA application runs on real data, i.e. data downloaded from your Mastodon
 
 After this, your new application will appear in the applications page. If you click on its name, you will be able to see the application credentials including its client key, client secret, and access token.
 
-The two pieces of information you will need to pass BYOTA to access your account are this token (which we will refer to as `MASTODON_ACCESS_TOKEN` from now on) and the API base URL of your Mastodon instance (which in most cases is the instance URL itself, and we call `MASTODON_API_BASE_URL`).
+The two pieces of information you will need to pass BYOTA to access your account are this token (which we will refer to as `MASTODON_ACCESS_TOKEN` from now on) and the API base URL of your Mastodon instance (which we call `MASTODON_API_BASE_URL`).
+Note that this URL is, unless specified differently by your instance admins, the same URL you usally connect to with your browser: for instance, for the mastodon.social instance it is https://mastodon.social.
 
 ### Running BYOTA as a Docker container
 
