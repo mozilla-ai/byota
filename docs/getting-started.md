@@ -15,7 +15,7 @@ The BYOTA demo is a [marimo](https://marimo.io/) application that allows you to 
 - one-click access to HuggingFace spaces:
   - [![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/byota)  (👉 make sure link is ok)
 - locally with Docker:
-  1. `docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota demo.py`
+  1. `docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota:latest demo.py`
   1. open a browser and connect to http://localhost:2718
 
 
@@ -43,7 +43,7 @@ The two pieces of information you will need to pass BYOTA to access your account
 Now that you have a registered application and its access token, you can run BYOTA's Docker container as follows:
 
 ```
-docker run -it -p 8080:8080 -p 2718:2718 -e MASTODON_ACCESS_TOKEN="<your_access_token>" -e MASTODON_API_BASE_URL="<your_api_base_url>" mzdotai/byota
+docker run -it -p 8080:8080 -p 2718:2718 -e MASTODON_ACCESS_TOKEN="<your_access_token>" -e MASTODON_API_BASE_URL="<your_api_base_url>" mzdotai/byota:latest
 ```
 
 Once the container is up and running, you can open the marimo notebook (which is started by default in [app view](https://docs.marimo.io/guides/apps/)) by connecting to http://localhost:2718. You will be asked a password which is, by default, `byota` (you can customize it in the `entrypoint.sh` file when you build your own image).
@@ -53,7 +53,7 @@ Once the container is up and running, you can open the marimo notebook (which is
 > If for any reason you don't want to directly pass your credentials on the command line, you can also run the docker container as follows:
 >
 >```
->docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota
+>docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota:latest
 >```
 >
 >... and provide the credentials in a json file called `auth.json`, formatted like follows:
