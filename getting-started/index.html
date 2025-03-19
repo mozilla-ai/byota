@@ -599,7 +599,7 @@
 <li>one-click access to HuggingFace spaces:</li>
 <li><a href="https://huggingface.co/spaces/mozilla-ai/byota"><img alt="Try on Spaces" src="https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue" /></a>  (👉 make sure link is ok)</li>
 <li>locally with Docker:</li>
-<li><code>docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota demo.py</code></li>
+<li><code>docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota:latest demo.py</code></li>
 <li>open a browser and connect to http://localhost:2718</li>
 </ul>
 <h2 id="byota-running-on-real-data">BYOTA (running on real data)</h2>
@@ -615,16 +615,17 @@
 </ol>
 <p><img alt="alt text" src="../images/mastodon_credentials.png" /></p>
 <p>After this, your new application will appear in the applications page. If you click on its name, you will be able to see the application credentials including its client key, client secret, and access token.</p>
-<p>The two pieces of information you will need to pass BYOTA to access your account are this token (which we will refer to as <code>MASTODON_ACCESS_TOKEN</code> from now on) and the API base URL of your Mastodon instance (which in most cases is the instance URL itself, and we call <code>MASTODON_API_BASE_URL</code>).</p>
+<p>The two pieces of information you will need to pass BYOTA to access your account are this token (which we will refer to as <code>MASTODON_ACCESS_TOKEN</code> from now on) and the API base URL of your Mastodon instance (which we call <code>MASTODON_API_BASE_URL</code>).
+Note that this URL is, unless specified differently by your instance admins, the same URL you usually connect to with your browser: for instance, for the mastodon.social instance it is https://mastodon.social.</p>
 <h3 id="running-byota-as-a-docker-container">Running BYOTA as a Docker container</h3>
 <p>Now that you have a registered application and its access token, you can run BYOTA's Docker container as follows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker run -it -p 8080:8080 -p 2718:2718 -e MASTODON_ACCESS_TOKEN=&quot;&lt;your_access_token&gt;&quot; -e MASTODON_API_BASE_URL=&quot;&lt;your_api_base_url&gt;&quot; mzdotai/byota
+<div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>docker run -it -p 8080:8080 -p 2718:2718 -e MASTODON_ACCESS_TOKEN=&quot;&lt;your_access_token&gt;&quot; -e MASTODON_API_BASE_URL=&quot;&lt;your_api_base_url&gt;&quot; mzdotai/byota:latest
 </span></code></pre></div>
 <p>Once the container is up and running, you can open the marimo notebook (which is started by default in <a href="https://docs.marimo.io/guides/apps/">app view</a>) by connecting to http://localhost:2718. You will be asked a password which is, by default, <code>byota</code> (you can customize it in the <code>entrypoint.sh</code> file when you build your own image).</p>
 <blockquote>
 <p><strong>NOTE</strong></p>
 <p>If for any reason you don't want to directly pass your credentials on the command line, you can also run the docker container as follows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota:latest
 </span></code></pre></div>
 <p>... and provide the credentials in a json file called <code>auth.json</code>, formatted like follows:</p>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>{
