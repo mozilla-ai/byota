@@ -48,7 +48,7 @@ Run the demo (no Mastodon account needed!):
 
 - [![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/byota)  (👉 make sure link is ok)
 - locally with Docker:
-  - `docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota demo.py`
+  - `docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota:latest demo.py`
   - open a browser and connect to http://localhost:2718
   - when asked a password, enter `byota`
 

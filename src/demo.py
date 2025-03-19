@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.19"
+__generated_with = "0.11.21"
 app = marimo.App(width="medium")
 
 
@@ -241,21 +241,14 @@ def _(embeddings, mo, rerank_form):
         as they allow semantic similar statuses to be close in the embedding space. This allows you to use
         the simple concept of *distance between points* to group statuses and search them.
 
-        In section, we are going to perform actual timeline re-ranking. To do this, we'll still rely on the
+        In this section, you will perform actual timeline re-ranking. To do this, you'll still rely on the
         concept of text similarity, assigning a higher score to those posts which are most similar to *a set
-        of other posts*. The set we choose to consider as a reference is the one of the posts you wrote or
+        of other posts*. The set you'll use as a reference is the one of the posts you wrote or
         reposted from others.
 
-        For the sake of this open demo, the posts are not the ones *you* wrote, but I provided a subset of
+        **NOTE**: For the sake of this open demo, the posts are not the ones *you* wrote, but I provided a subset of
         those posted by https://fosstodon.org/@mala (that's me!). This way, you can get a better sense of
         how this would work with some real data rather than a fully synthetic dataset.
-
-        Inside "Your statuses" you will be able to see my posts and get a general idea about the things
-        I write the most about. You can choose how many statuses are used for re-ranking (1 page = 20 posts)
-        and see how results differ depending on what contents you include.
-
-        Inside "Your re-ranked timeline", you will see posts from the synthetic timelines (you can choose
-        between home, local, and public), re-ranked to prioritize those topics I write the most about.
         """),
             rerank_form,
         ]
@@ -318,9 +311,16 @@ def _(
     # show everything
     mo.vstack(
         [
-            mo.md("## Your statuses:"),
+            mo.md("""## Your statuses:
+    This table shows the content of the posts that are used for re-ranking the timeline. You can change
+    their number in the form above (1 page = 20 posts), check them out here, and verify in the table below
+    this one how ranking changes depending on the contents you include.
+    """),
             user_statuses_df,
-            mo.md("## Your re-ranked timeline:"),
+            mo.md("""## Your re-ranked timeline:
+    This table shows posts from the synthetic timelines (you can choose between home, local, and public
+    in the form above), re-ranked to prioritize the main topics inferred from the posts in the previous table.
+    """),
             # show statuses sorted by idx
             dataframes[timeline_to_rerank].iloc[idx][["label", "text"]],
         ]
