@@ -341,20 +341,62 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Overview
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#byota-is-running-now-what" class="md-nav__link">
     <span class="md-ellipsis">
       BYOTA is running... Now what?
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="BYOTA is running... Now what?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#embeddings-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Embeddings Visualization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeline-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      Timeline search
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeline-re-ranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      Timeline re-ranking
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#re-rank-your-own-posts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Re-rank your own posts
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -453,20 +495,62 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#overview" class="md-nav__link">
-    <span class="md-ellipsis">
-      Overview
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#byota-is-running-now-what" class="md-nav__link">
     <span class="md-ellipsis">
       BYOTA is running... Now what?
     </span>
   </a>
+  
+    <nav class="md-nav" aria-label="BYOTA is running... Now what?">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Configuration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#embeddings-visualization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Embeddings Visualization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeline-search" class="md-nav__link">
+    <span class="md-ellipsis">
+      Timeline search
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#timeline-re-ranking" class="md-nav__link">
+    <span class="md-ellipsis">
+      Timeline re-ranking
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#re-rank-your-own-posts" class="md-nav__link">
+    <span class="md-ellipsis">
+      Re-rank your own posts
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -508,17 +592,23 @@
 
 
 <h1 id="step-by-step-guide-how-this-blueprint-works"><strong>Step-by-Step Guide: How this Blueprint Works</strong></h1>
-<hr />
-<h2 id="overview"><strong>Overview</strong></h2>
-<ul>
-<li>BYOTA components and architecture</li>
-<li>explain it is more like a playground for local algorithms, but allows to easily share the tool with ppl who are not developers</li>
-<li>a few more words about alternative deployments</li>
-</ul>
-<hr />
 <h2 id="byota-is-running-now-what">BYOTA is running... Now what?</h2>
-<p>The Configuration section allows you to choose which timeline(s) you want to download, the embeddings server API you want to use (see details in the previous section), and whether to run in offline mode (in this case statuses won't be downloaded, but read from a file where you have previously saved them).</p>
+<h3 id="configuration">Configuration</h3>
+<p>The Configuration section allows you to choose which timeline(s) you want to download, the embeddings server API you want to use (see details <a href="https://mozilla-ai.github.io/byota/getting-started/#step-1-running-a-local-embedding-server">here</a>), and whether to run in offline mode (in this case statuses won't be downloaded, but read from a file where you have previously saved them).</p>
+<p>After you click on the submit button, posts from the timelines will be downloaded and their embeddings calculated.</p>
 <p><img alt="A configuration panel showing the sections &quot;Timelines&quot;, &quot;Embeddings&quot;, and &quot;Caching&quot;" src="../images/configuration.png" /></p>
+<h3 id="embeddings-visualization">Embeddings Visualization</h3>
+<p>In this section, you can see posts from different timelines represented as points on a plane: you can click on a timeline label on the top right to highlight only posts from that timeline. If you select one or more points, you will see them in the table below the plot. By clicking on the column names (e.g. label, text) you can sort them, wrap text (to see full post contents), or search their content.</p>
+<p><img alt="A plot depicting a 2d cloud of points with different colors (blue, orange, red). The title of the plot is &quot;Timeline visualization&quot;. On the top right, a legenda matches each color with a different string (blue=home, orange=local, red=public). Some posts appear as selected within a rectangular area, and in a table below the plot posts id, labels, and contents are shown. Contents appear to be all related to the same topic, reading and books." src="../images/embeddings_viz.png" /></p>
+<h3 id="timeline-search">Timeline search</h3>
+<p>Here you can search for the most similar posts to a given one. You can either provide a row id (the leftmost column in the previous table) to refer to an existing post, or freeform text to look for posts which are similar in content to what you wrote.</p>
+<p><img alt="A form with a text saying &quot;Enter a status id or some free-form text to find the most similar statuses&quot;. The content of the text box below that is &quot;I like everything open source, free software, and digital rights&quot;. Below that, six posts are shown in a three-column table: on the left some IDs, in the center a column titled &quot;label&quot; shows values such as &quot;public&quot;, &quot;local&quot;, and on the right a column called &quot;text&quot; show the content of some statuses, containing text such as &quot;Digital tools shape modern life&quot;, &quot;Open source isn't just about free software&quot;, and &quot;Initially skeptical, I discovered open source isn't free as in cheap, but free as in freedom&quot;." src="../images/search.png" /></p>
+<h3 id="timeline-re-ranking">Timeline re-ranking</h3>
+<p>A score is assigned to each post in the timeline, with higher scores given to posts that are more similar to a set of other posts (in the specific case of the demo, statuses I shared from my personal Mastodon account). This score is then used to re-rank a timeline of your choice to prioritize those topics which are more present in the reference set.</p>
+<p><img alt="A table, similar to the one appearing in the previous image. In this case the posts appear to belong to different topics, including the gopher protocol, algorithms, open source and free software, machine learning and AI." src="../images/reranking.png" /></p>
+<h3 id="re-rank-your-own-posts">Re-rank your own posts</h3>
+<p>Depending on the timeline you are considering, it might be more or less hard to understand how well the re-ranking worked. To give you a better sense of the effect of re-ranking, this section re-ranks an individual’s set of posts, according to a topic identified by some well-known tag.</p>
+<p><img alt="A text field labeled &quot;Enter a tag name&quot; and containing the string &quot;retrocomputing. Below that, some text saying &quot;Your own posts, re-ranked according to their similarity to posts in retrogaming&quot;. Below that another table, similar to the ones above, containing posts which appear to belong to different topics, the first ones more likely to be related to gaming." src="../images/own_rerank.png" /></p>
 <h2 id="customizing-the-blueprint">🎨 <strong>Customizing the Blueprint</strong></h2>
 <p>To better understand how you can tailor this Blueprint to suit your specific needs, please visit the <strong><a href="../customization/">Customization Guide</a></strong>.</p>
 <h2 id="contributing-to-the-blueprint">🤝 <strong>Contributing to the Blueprint</strong></h2>
