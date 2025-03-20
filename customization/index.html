@@ -511,17 +511,24 @@
 <p>This Blueprint is designed to be flexible and easily adaptable to your specific needs. This guide will walk you through some key areas you can customize to make the Blueprint your own.</p>
 <hr />
 <h2 id="changing-embedding-model-engine">🧠 <strong>Changing Embedding Model / Engine</strong></h2>
-<ul>
-<li>run a different llamafile</li>
-<li>run a different model with ollama</li>
-</ul>
+<p>BYOTA currently supports <a href="https://mozilla-ai.github.io/byota/getting-started/#step-1-running-a-local-embedding-server">both llamafile and ollama</a>
+as embedding engines. This means you can choose to run either as long as you provide the correct server
+URL. Llamafile follows the OpenAI API, so in theory other engines which are compatible with it should
+work with BYOTA.</p>
+<p>The embedding model used by default is <a href="https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2">all-MiniLM-L6-v2</a>.
+If you want to try a different one, you can follow the instructions provided for the engine of your choice
+(pointers to documentation for llamafile and ollama are already available <a href="https://mozilla-ai.github.io/byota/getting-started/#step-1-running-a-local-embedding-server">here</a>).</p>
 <h2 id="using-a-different-data-source">📝 <strong>Using a different data source</strong></h2>
-<p>... Why not Bluesky, different mastodon instances, RSS feeds?</p>
+<p>Except for the code that downloads timeline and personal posts, BYOTA is platform-agnostic so you can just plug in a different client and get recommendations for your own favorite platform. As long as you have a pandas dataframe to
+pass as an input you can work with synthetic data (as we did in the demo), feeds from other social networks, article
+summaries from RSS feeds... Your imagination is the limit!</p>
 <h2 id="other-customization-ideas">💡 Other Customization Ideas</h2>
-<ul>
-<li>use different data: why just text? What can we do with e.g. images?</li>
-<li>use different algorithms: what can we run locally and how much compute do we need for that? Can we train a model for e.g. classification on top of the embeddings?</li>
-</ul>
+<p>Do you want to run different algorithms or create a whole new application based on BYOTA's ideas? We like your enthusiasm 😁
+You can clone the repo and start changing BYOTA's code straight away, just follow the steps in
+<a href="https://mozilla-ai.github.io/byota/getting-started/#step-2-running-the-marimo-notebook-in-edit-mode">Running the marimo notebook in edit mode</a>.</p>
+<p>Anything, from alternatives to the simple dot-product re-ranker we have implemented, up to simple classifiers to be trained on top of the embeddings, sounds like an interesting idea, especially if it runs as WASM (for people to execute the code locally in their browser). You can find some
+ideas for new features in the <a href="https://github.com/mozilla-ai/byota/issues">issues section of the repo</a>, or add new
+ones if you are looking for people to collaborate with.</p>
 <h2 id="contributing-to-the-blueprint">🤝 <strong>Contributing to the Blueprint</strong></h2>
 <p>Want to help improve or extend this Blueprint? Check out the <strong><a href="../future-features-contributions/">Future Features &amp; Contributions Guide</a></strong> to see how you can contribute your ideas, code, or feedback to make this Blueprint even better!</p>
 
