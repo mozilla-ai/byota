@@ -27,7 +27,7 @@ jobs:
         with:
           images: mzdotai/byota
           flavor: |
-            latest=auto
+            latest=true
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
