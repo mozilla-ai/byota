@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.19"
+__generated_with = "0.11.21"
 app = marimo.App(width="medium")
 
 
@@ -22,7 +22,6 @@ def _():
     import time
     import functools
     import altair as alt
-    from bs4 import BeautifulSoup
     from sklearn.manifold import TSNE
     import pandas as pd
     from pathlib import Path
@@ -38,7 +37,6 @@ def _():
     from byota.search import SearchService
 
     return (
-        BeautifulSoup,
         EmbeddingService,
         LLamafileEmbeddingService,
         OllamaEmbeddingService,
@@ -304,7 +302,6 @@ def _(
     dataframes,
     embedding_service,
     embeddings,
-    get_compact_data,
     mastodon_client,
     mo,
     np,
@@ -326,7 +323,7 @@ def _(
         exclude_reblogs=rerank_form.value["exclude_reblogs"],
     )
     user_statuses_df = pd.DataFrame(
-        get_compact_data(user_statuses), columns=["id", "text"]
+        byota_mastodon.get_compact_data(user_statuses), columns=["id", "text"]
     )
     user_statuses_embeddings = embedding_service.calculate_embeddings(
         user_statuses_df["text"]
@@ -428,21 +425,15 @@ def _(mo, rerank_form, tag_form):
 
 
 @app.cell
-def _(
-    byota_mastodon,
-    embedding_service,
-    get_compact_data,
-    mastodon_client,
-    mo,
-    pd,
-    rerank_form,
-):
+def _(byota_mastodon, embedding_service, mastodon_client, mo, pd, rerank_form):
     mo.stop(rerank_form.value is None)
 
     my_posts = byota_mastodon.get_paginated_statuses(
         mastodon_client, max_pages=10, exclude_reblogs=True, exclude_replies=True
     )
-    my_posts_df = pd.DataFrame(get_compact_data(my_posts), columns=["id", "text"])
+    my_posts_df = pd.DataFrame(
+        byota_mastodon.get_compact_data(my_posts), columns=["id", "text"]
+    )
     my_posts_embeddings = embedding_service.calculate_embeddings(my_posts_df["text"])
     return my_posts, my_posts_df, my_posts_embeddings
 
@@ -451,7 +442,6 @@ def _(
 def _(
     byota_mastodon,
     embedding_service,
-    get_compact_data,
     mastodon_client,
     mo,
     my_posts_df,
@@ -465,7 +455,9 @@ def _(
     tag_posts = byota_mastodon.get_paginated_data(
         mastodon_client, tag_name, max_pages=1
     )
-    tag_posts_df = pd.DataFrame(get_compact_data(tag_posts), columns=["id", "text"])
+    tag_posts_df = pd.DataFrame(
+        byota_mastodon.get_compact_data(tag_posts), columns=["id", "text"]
+    )
     tag_posts_embeddings = embedding_service.calculate_embeddings(tag_posts_df["text"])
 
     # calculate the re-ranking index
@@ -619,7 +611,7 @@ def _(mo):
 
 
 @app.cell
-def _(BeautifulSoup, EmbeddingService, byota_mastodon, mo, pd, pickle, time):
+def _(EmbeddingService, byota_mastodon, mo, pd, pickle, time):
     def build_cache_paginated_data(
         mastodon_client, timelines: list, cached: bool, paginated_data_file: str
     ) -> dict[str, any]:
@@ -660,7 +652,8 @@ def _(BeautifulSoup, EmbeddingService, byota_mastodon, mo, pd, pickle, time):
             dataframes = {}
             for k in paginated_data:
                 dataframes[k] = pd.DataFrame(
-                    get_compact_data(paginated_data[k]), columns=["id", "text"]
+                    byota_mastodon.get_compact_data(paginated_data[k]),
+                    columns=["id", "text"],
                 )
             with open(dataframes_data_file, "wb") as f:
                 pickle.dump(dataframes, f)
@@ -711,26 +704,10 @@ def _(BeautifulSoup, EmbeddingService, byota_mastodon, mo, pd, pickle, time):
 
         return embeddings
 
-    def get_compact_data(paginated_data: list) -> list[tuple[int, str]]:
-        """Extract compact (id, text) pairs from a paginated list of statuses."""
-        compact_data = []
-        for page in paginated_data:
-            for toot in page:
-                id = toot.id
-                cont = toot.content
-                if toot.reblog:
-                    id = toot.reblog.id
-                    cont = toot.reblog.content
-                soup = BeautifulSoup(cont, features="html.parser")
-                # print(f"{id}: {soup.get_text()}")
-                compact_data.append((id, soup.get_text()))
-        return compact_data
-
     return (
         build_cache_dataframes,
         build_cache_embeddings,
         build_cache_paginated_data,
-        get_compact_data,
     )
 
 

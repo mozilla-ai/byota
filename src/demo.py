@@ -570,7 +570,7 @@ def _(mo):
 
 
 @app.cell
-def _(BeautifulSoup, EmbeddingService, mo, pickle, time):
+def _(EmbeddingService, mo, pickle, time):
     def load_dataframes(data_file):
         dataframes = None
         print(f"Loading cached dataframes from {data_file}")
@@ -618,27 +618,7 @@ def _(BeautifulSoup, EmbeddingService, mo, pickle, time):
 
         return embeddings
 
-    def get_compact_data(paginated_data: list) -> list[tuple[int, str]]:
-        """Extract compact (id, text) pairs from a paginated list of statuses."""
-        compact_data = []
-        for page in paginated_data:
-            for toot in page:
-                id = toot.id
-                cont = toot.content
-                if toot.reblog:
-                    id = toot.reblog.id
-                    cont = toot.reblog.content
-                soup = BeautifulSoup(cont, features="html.parser")
-                # print(f"{id}: {soup.get_text()}")
-                compact_data.append((id, soup.get_text()))
-        return compact_data
-
-    return build_cache_embeddings, get_compact_data, load_dataframes
-
-
-@app.cell
-def _():
-    return
+    return build_cache_embeddings, load_dataframes
 
 
 if __name__ == "__main__":
