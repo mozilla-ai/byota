@@ -1,6 +1,7 @@
 import mastodon
 import marimo as mo
 from loguru import logger
+from bs4 import BeautifulSoup
 
 # -- Mastodon ----------------------------------------------------------------
 
@@ -102,3 +103,27 @@ def get_paginated_statuses(
                 print("No more pages available.")
                 break
     return paginated_data
+
+
+def get_compact_data(paginated_data: list) -> list[tuple[int, str]]:
+    """
+    Extract compact (id, text) pairs from a paginated list of statuses.
+    Honor the author's `discoverable` tag and add the status only if the
+    value is True.
+    """
+
+    compact_data = []
+    for page in paginated_data:
+        for toot in page:
+            # skip the post if the account has discoverable == False
+            if not toot.account.discoverable:
+                continue
+            id = toot.id
+            cont = toot.content
+            if toot.reblog:
+                id = toot.reblog.id
+                cont = toot.reblog.content
+            soup = BeautifulSoup(cont, features="html.parser")
+            # print(f"{id}: {soup.get_text()}")
+            compact_data.append((id, soup.get_text()))
+    return compact_data
