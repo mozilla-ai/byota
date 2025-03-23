@@ -105,7 +105,9 @@ def get_paginated_statuses(
     return paginated_data
 
 
-def get_compact_data(paginated_data: list) -> list[tuple[int, str]]:
+def get_compact_data(
+    paginated_data: list, honor_discoverable: bool = True
+) -> list[tuple[int, str]]:
     """
     Extract compact (id, text) pairs from a paginated list of statuses.
     Honor the author's `discoverable` tag and add the status only if the
@@ -116,7 +118,7 @@ def get_compact_data(paginated_data: list) -> list[tuple[int, str]]:
     for page in paginated_data:
         for toot in page:
             # skip the post if the account has discoverable == False
-            if not toot.account.discoverable:
+            if honor_discoverable and not toot.account.discoverable:
                 continue
             id = toot.id
             cont = toot.content
