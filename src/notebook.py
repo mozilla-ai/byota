@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.21"
+__generated_with = "0.13.11"
 app = marimo.App(width="medium")
 
 
@@ -18,103 +18,84 @@ def _():
 def _():
     import marimo as mo
     import pickle
-    import requests
     import time
-    import functools
     import altair as alt
     from sklearn.manifold import TSNE
     import pandas as pd
-    from pathlib import Path
-    import json
-    import os
 
     from byota.embeddings import (
         EmbeddingService,
         LLamafileEmbeddingService,
         OllamaEmbeddingService,
     )
-    import byota.mastodon as byota_mastodon
+    import byota.config as config
+    import byota.layout as layout
+    import byota.mastodon
     from byota.search import SearchService
 
     return (
         EmbeddingService,
         LLamafileEmbeddingService,
         OllamaEmbeddingService,
-        Path,
         SearchService,
         TSNE,
         alt,
-        byota_mastodon,
-        functools,
-        json,
+        byota,
+        config,
+        layout,
         mo,
-        os,
         pd,
         pickle,
-        requests,
         time,
     )
 
 
 @app.cell
-def _(Path, byota_mastodon, json, mo, os):
+def _(byota, config, mo):
     # internal variables
 
     # credentials filename
     cred_filename = "auth.json"
 
     # dump files for offline mode
-    paginated_data_file = "dump_paginated_data.pkl"
     dataframes_data_file = "dump_dataframes.pkl"
     embeddings_data_file = "dump_embeddings.pkl"
 
-    # login (and break if that does not work)
-    if Path(cred_filename).is_file():
-        with Path("auth.json").open() as f:
-            credentials = json.load(f)
-        mastodon_client = byota_mastodon.login(
-            access_token=credentials.get("MASTODON_ACCESS_TOKEN"),
-            api_base_url=credentials.get("MASTODON_API_BASE_URL"),
-        )
-    else:
-        mastodon_client = byota_mastodon.login(
-            access_token=os.environ.get("MASTODON_ACCESS_TOKEN"),
-            api_base_url=os.environ.get("MASTODON_API_BASE_URL"),
+    accounts = config.load_accounts(cred_filename)
+
+    clients = {}
+    for account in accounts:
+        clients[account.name] = byota.mastodon.login(
+            access_token=account.MASTODON_ACCESS_TOKEN,
+            api_base_url=account.MASTODON_API_BASE_URL,
         )
 
     mo.stop(
-        mastodon_client is None,
+        len(clients) < len(accounts),
         mo.md("**Authentication error: please check your credentials.**").center(),
     )
-    return (
-        cred_filename,
-        credentials,
-        dataframes_data_file,
-        embeddings_data_file,
-        f,
-        mastodon_client,
-        paginated_data_file,
-    )
+    return accounts, clients, dataframes_data_file, embeddings_data_file
 
 
 @app.cell
-def _(configuration_form):
+def _(accounts, layout):
+    configuration_form = layout.create_configuration_form(accounts)
     configuration_form
-    return
+    return (configuration_form,)
 
 
 @app.cell
 def _(
     LLamafileEmbeddingService,
     OllamaEmbeddingService,
+    byota,
     configuration_form,
-    invalid_form,
+    layout,
     mo,
-    timelines_dict,
 ):
     # check for anything invalid in the form
     mo.stop(
-        invalid_form(configuration_form),
+        layout.invalid_form(configuration_form),
         mo.md("**Submit the form to continue.**").center(),
     )
 
@@ -137,72 +118,34 @@ def _(
     )
 
     # collect the names of the timelines we want to download from
-    timelines = []
-    for k in timelines_dict.keys():
-        if configuration_form.value[k]:
-            tl_string = timelines_dict[k]
-            if tl_string in ["tag", "list"]:
-                tl_string += f'/{configuration_form.value[f"{k}_txt"]}'
-            timelines.append(tl_string)
+    timelines = byota.mastodon.extract_selected_timelines(configuration_form.value)
 
     # set offline mode
     offline_mode = configuration_form.value["offline_mode"]
 
     # choose what to read from cache
-    cached_timelines = offline_mode
     cached_dataframes = offline_mode
     cached_embeddings = offline_mode
-    return (
-        cached_dataframes,
-        cached_embeddings,
-        cached_timelines,
-        embedding_service,
-        k,
-        offline_mode,
-        timelines,
-        tl_string,
-    )
+    return cached_dataframes, cached_embeddings, embedding_service, timelines
 
 
 @app.cell
-def _(mo, timelines):
-    mo.md(f"""
-    ###Downloading paginated data from the following timelines: {", ".join(timelines)}
-    """).center()
+def _(mo):
+    # mo.md(f"""
+    # ###Downloading statuses from the following timelines: {", ".join([x["name"] for x in timelines])}
+    # """).center()
+    mo.md("### Downloading timelines").center()
     return
 
 
 @app.cell
-def _(
-    build_cache_dataframes,
-    build_cache_paginated_data,
-    cached_dataframes,
-    cached_timelines,
-    dataframes_data_file,
-    mastodon_client,
-    mo,
-    paginated_data_file,
-    timelines,
-):
-    paginated_data = build_cache_paginated_data(
-        mastodon_client, timelines, cached_timelines, paginated_data_file
-    )
-    mo.stop(paginated_data is None, mo.md("**Issues getting paginated data**"))
-
-    dataframes = build_cache_dataframes(
-        paginated_data, cached_dataframes, dataframes_data_file
+def _(byota, cached_dataframes, clients, dataframes_data_file, mo, timelines):
+    dataframes = byota.mastodon.download_to_dataframes(
+        clients, timelines, cached_dataframes, dataframes_data_file
     )
 
-    mo.stop(paginated_data is None, mo.md("**Issues building dataframes**"))
-    return dataframes, paginated_data
-
-
-@app.cell
-def _(dataframes, mo):
-    mo.md(f"""
-    ### Calculating embeddings for the downloaded timeline{"s" if len(dataframes.keys())>1 else ""}.
-    """).center()
-    return
+    mo.stop(dataframes is None, mo.md("**Issues building dataframes**"))
+    return (dataframes,)
 
 
 @app.cell
@@ -220,6 +163,14 @@ def _(
     )
     mo.stop(embeddings is None, mo.md("**Issues calculating embeddings**"))
     return (embeddings,)
+
+
+@app.cell
+def _(dataframes, mo):
+    mo.md(f"""
+    ### Calculating embeddings for the downloaded timeline{"s" if len(dataframes.keys())>1 else ""}
+    """).center()
+    return
 
 
 @app.cell
@@ -257,7 +208,7 @@ def _(TSNE, alt, dataframes, embeddings, mo, pd):
         .mark_point()
         .encode(x="x", y="y", color="label")
     )
-    return all_embeddings, chart, df_, np, tsne
+    return all_embeddings, chart, df_, np
 
 
 @app.cell
@@ -274,11 +225,12 @@ def _(chart, mo):
 
 
 @app.cell
-def _(embeddings, mo, query_form):
+def _(embeddings, layout, mo):
     mo.stop(embeddings is None)
 
+    query_form = layout.create_query_form()
     mo.vstack([mo.md("# Timeline search"), query_form])
-    return
+    return (query_form,)
 
 
 @app.cell
@@ -286,23 +238,26 @@ def _(SearchService, all_embeddings, df_, embedding_service, query_form):
     search_service = SearchService(all_embeddings, embedding_service)
     indices = search_service.most_similar_indices(query_form.value)
     df_.iloc[indices][["label", "text"]]
-    return indices, search_service
-
-
-@app.cell
-def _(embeddings, mo, rerank_form):
-    mo.stop(embeddings is None)
-    rerank_form
     return
 
 
 @app.cell
+def _(accounts, dataframes, embeddings, layout, mo):
+    mo.stop(embeddings is None)
+    rerank_form = layout.create_rerank_form(
+        list(dataframes.keys()), [acc.name for acc in accounts]
+    )
+    rerank_form
+    return (rerank_form,)
+
+
+@app.cell
 def _(
-    byota_mastodon,
+    byota,
+    clients,
     dataframes,
     embedding_service,
     embeddings,
-    mastodon_client,
     mo,
     np,
     pd,
@@ -315,15 +270,18 @@ def _(
     mo.stop(rerank_form.value is None, mo.md("**Submit the form to continue.**"))
 
     timeline_to_rerank = rerank_form.value["timeline_to_rerank"]
+    user_account = rerank_form.value["user_account"]
+
+    client_for_user_posts = clients[user_account]
 
     # download and calculate embeddings of user statuses
-    user_statuses = byota_mastodon.get_paginated_statuses(
-        mastodon_client,
+    user_statuses = byota.mastodon.get_paginated_statuses(
+        client_for_user_posts,
         max_pages=rerank_form.value["num_user_status_pages"],
         exclude_reblogs=rerank_form.value["exclude_reblogs"],
     )
     user_statuses_df = pd.DataFrame(
-        byota_mastodon.get_compact_data(user_statuses), columns=["id", "text"]
+        byota.mastodon.get_compact_data(user_statuses), columns=["id", "text"]
     )
     user_statuses_embeddings = embedding_service.calculate_embeddings(
         user_statuses_df["text"]
@@ -362,14 +320,7 @@ def _(
             dataframes[timeline_to_rerank].iloc[idx][["label", "text"]],
         ]
     )
-    return (
-        idx,
-        rerank_start_time,
-        timeline_to_rerank,
-        user_statuses,
-        user_statuses_df,
-        user_statuses_embeddings,
-    )
+    return client_for_user_posts, user_account
 
 
 @app.cell
@@ -403,60 +354,64 @@ def _():
 
 
 @app.cell
-def _(mo, rerank_form, tag_form):
+def _(layout, mo, rerank_form, user_account):
     mo.stop(rerank_form.value is None)
+
+    tag_form = layout.create_tag_form(user_account)
 
     mo.vstack(
         [
             mo.md("""
-        # Re-Ranking your own posts
-        Depending on the timeline you are considering, it might be more or less hard
-        to understand how well the re-ranking worked.
-        To give you a better sense of the effect of re-ranking, let us take the posts
-        you wrote and re-rank them according to some well-known tag.
-        Feel free to test the following code with different tags, depending on your
-        various interests, and see whether your own posts related to a given interest
-        are surfaced by a related tag.
+    # Re-Ranking your own posts
+    Depending on the timeline you are considering, it might be more or less hard
+    to understand how well the re-ranking worked.
+    To give you a better sense of the effect of re-ranking, let us take the posts
+    you wrote and re-rank them according to some well-known tag.
+    Feel free to test the following code with different tags, depending on your
+    various interests, and see whether your own posts related to a given interest
+    are surfaced by a related tag.
         """),
             tag_form,
         ]
     )
-    return
+    return (tag_form,)
 
 
 @app.cell
-def _(byota_mastodon, embedding_service, mastodon_client, mo, pd, rerank_form):
+def _(byota, client_for_user_posts, embedding_service, mo, pd, rerank_form):
     mo.stop(rerank_form.value is None)
 
-    my_posts = byota_mastodon.get_paginated_statuses(
-        mastodon_client, max_pages=10, exclude_reblogs=True, exclude_replies=True
+    my_posts = byota.mastodon.get_paginated_statuses(
+        client_for_user_posts, max_pages=10, exclude_reblogs=True, exclude_replies=True
     )
     my_posts_df = pd.DataFrame(
-        byota_mastodon.get_compact_data(my_posts), columns=["id", "text"]
+        byota.mastodon.get_compact_data(my_posts), columns=["id", "text"]
     )
     my_posts_embeddings = embedding_service.calculate_embeddings(my_posts_df["text"])
-    return my_posts, my_posts_df, my_posts_embeddings
+    return my_posts_df, my_posts_embeddings
 
 
 @app.cell
 def _(
-    byota_mastodon,
+    byota,
+    client_for_user_posts,
     embedding_service,
-    mastodon_client,
     mo,
     my_posts_df,
     my_posts_embeddings,
     np,
     pd,
     tag_form,
+    user_account,
 ):
     tag_name = f"tag/{tag_form.value}"
 
-    tag_posts = byota_mastodon.get_paginated_data(
-        mastodon_client, tag_name, max_pages=1
+    ### TODO: Fix with a client chosen by the user!!!
+    tag_posts = byota.mastodon.get_paginated_data(
+        client_for_user_posts, tag_name, max_pages=1
     )
     tag_posts_df = pd.DataFrame(
-        byota_mastodon.get_compact_data(tag_posts), columns=["id", "text"]
+        byota.mastodon.get_compact_data(tag_posts), columns=["id", "text"]
     )
     tag_posts_embeddings = embedding_service.calculate_embeddings(tag_posts_df["text"])
 
@@ -472,202 +427,17 @@ def _(
     mo.vstack(
         [
             mo.md(
-                f"### Your own posts, re-ranked according to their similarity to posts in {tag_name}"
+                f"### Your own posts, re-ranked according to their similarity to posts in {user_account}:{tag_name}"
             ),
             my_posts_df.iloc[my_idx][["text", "scores"]],
         ]
     )
     # my_posts_df[['text', 'scores']]
-    return my_idx, tag_name, tag_posts, tag_posts_df, tag_posts_embeddings
+    return
 
 
 @app.cell
-def _(mo):
-    # Create the Configuration form
-
-    configuration_form = (
-        mo.md(
-            """
-        # Configuration
-
-        **Timelines**
-
-        {tl_home} {tl_local} {tl_public}
-
-        {tl_hashtag} {tl_hashtag_txt} {tl_list} {tl_list_txt}
-
-        **Embeddings**
-
-        {emb_server}
-
-        {emb_server_url}
-
-        {emb_server_model}
-
-        **Caching**
-
-        {offline_mode}
-    """
-        )
-        .batch(
-            tl_home=mo.ui.checkbox(label="Home", value=True),
-            tl_local=mo.ui.checkbox(label="Local"),
-            tl_public=mo.ui.checkbox(label="Public"),
-            tl_hashtag=mo.ui.checkbox(label="Hashtag"),
-            tl_list=mo.ui.checkbox(label="List"),
-            tl_hashtag_txt=mo.ui.text(),
-            tl_list_txt=mo.ui.text(),
-            emb_server=mo.ui.radio(
-                label="Server type:",
-                options=["llamafile", "ollama"],
-                value="llamafile",
-                inline=True,
-            ),
-            emb_server_url=mo.ui.text(
-                label="Embedding server URL:",
-                value="http://localhost:8080/embedding",
-                full_width=True,
-            ),
-            emb_server_model=mo.ui.text(
-                label="Embedding server model:", value="all-minilm"
-            ),
-            offline_mode=mo.ui.checkbox(label="Run in offline mode (experimental)"),
-        )
-        .form(show_clear_button=True, bordered=True)
-    )
-
-    # a dictionary mapping Timeline UI checkboxes with the respective
-    # strings that identify them in the Mastodon API
-    timelines_dict = {
-        "tl_home": "home",
-        "tl_local": "local",
-        "tl_public": "public",
-        "tl_hashtag": "tag",
-        "tl_list": "list",
-    }
-
-    def invalid_form(form):
-        """A form (e.g. login) is invalid if it has no value,
-        or if any of its keys have no value."""
-        if form.value is None:
-            return True
-
-        for k in form.value.keys():
-            if form.value[k] is None:
-                return True
-
-        return False
-
-    return configuration_form, invalid_form, timelines_dict
-
-
-@app.cell
-def _(mo):
-    # Create a form for timeline re-ranking
-    rerank_form = (
-        mo.md(
-            """
-        # Timeline re-ranking
-        **User statuses**
-
-        {num_user_status_pages}    {exclude_reblogs}
-
-        **Timeline to rerank**
-
-        {timeline_to_rerank}
-    """
-        )
-        .batch(
-            num_user_status_pages=mo.ui.slider(
-                start=1, stop=20, label="Number of pages to load", value=1
-            ),
-            timeline_to_rerank=mo.ui.radio(
-                options=["home", "local", "public"], value="home"
-            ),
-            exclude_reblogs=mo.ui.checkbox(label="Exclude reblogs"),
-        )
-        .form(show_clear_button=True, bordered=True)
-    )
-    return (rerank_form,)
-
-
-@app.cell
-def _(mo):
-    query_form = mo.ui.text(
-        value="42",
-        label="Enter a status id or some free-form text to find the most similar statuses:\n",
-        full_width=True,
-    )
-    return (query_form,)
-
-
-@app.cell
-def _(mo):
-    tag_form = mo.ui.text(
-        value="gopher",
-        label="Enter a tag name:\n",
-    )
-    return (tag_form,)
-
-
-@app.cell
-def _(EmbeddingService, byota_mastodon, mo, pd, pickle, time):
-    def build_cache_paginated_data(
-        mastodon_client, timelines: list, cached: bool, paginated_data_file: str
-    ) -> dict[str, any]:
-        """Given a list of timeline names and a mastodon client,
-        use the mastodon client to get paginated data from each
-        and return a dictionary that contains, for each key, all
-        the retrieved data.
-        If cached==True, the `paginated_data_file` file will be loaded.
-        """
-        if not cached:
-            paginated_data = {}
-            for tl in timelines:
-                paginated_data[tl] = byota_mastodon.get_paginated_data(
-                    mastodon_client, tl
-                )
-            with open(paginated_data_file, "wb") as f:
-                pickle.dump(paginated_data, f)
-
-        else:
-            print(f"Loading cached paginated data from {paginated_data_file}")
-            try:
-                with open(paginated_data_file, "rb") as f:
-                    paginated_data = pickle.load(f)
-            except FileNotFoundError:
-                print(f"File {paginated_data_file} not found.")
-                return None
-        return paginated_data
-
-    def build_cache_dataframes(
-        paginated_data: dict[str, any], cached: bool, dataframes_data_file: str
-    ) -> dict[str, any]:
-        """Given a dictionary with paginated data from different timelines,
-        return another dictionary that contains, for each timeline, a compact
-        pandas DataFrame of (id, text) pairs.
-        If cached==True, the `dataframes_data_file` file will be loaded.
-        """
-        if not cached:
-            dataframes = {}
-            for k in paginated_data:
-                dataframes[k] = pd.DataFrame(
-                    byota_mastodon.get_compact_data(paginated_data[k]),
-                    columns=["id", "text"],
-                )
-            with open(dataframes_data_file, "wb") as f:
-                pickle.dump(dataframes, f)
-        else:
-            print(f"Loading cached dataframes from {dataframes_data_file}")
-            try:
-                with open(dataframes_data_file, "rb") as f:
-                    dataframes = pickle.load(f)
-            except FileNotFoundError:
-                print(f"File {dataframes_data_file} not found.")
-                return None
-
-        return dataframes
-
+def _(EmbeddingService, mo, pickle, time):
     def build_cache_embeddings(
         embedding_service: EmbeddingService,  # type: ignore
         dataframes: dict[str, any],
@@ -704,11 +474,7 @@ def _(EmbeddingService, byota_mastodon, mo, pd, pickle, time):
 
         return embeddings
 
-    return (
-        build_cache_dataframes,
-        build_cache_embeddings,
-        build_cache_paginated_data,
-    )
+    return (build_cache_embeddings,)
 
 
 @app.cell
