@@ -68,7 +68,7 @@ def load_accounts(cred_filename: str = "auth.json") -> List[MastodonAccount]:
 
         accounts = [
             MastodonAccount(
-                name="Default Account",
+                name="Default",
                 MASTODON_ACCESS_TOKEN=access_token,
                 MASTODON_API_BASE_URL=api_base_url,
             )

@@ -30,7 +30,7 @@ def create_configuration_form(accounts: list[MastodonAccount]):
     batch_dict = {}
 
     for acc in accounts:
-        account_name = acc.name.lower().replace(" ", "_")
+        account_name = acc.name
 
         # Add account section to markdown
         timelines_section += f"\n*{acc.name}*:\n\n"
