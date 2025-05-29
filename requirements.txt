@@ -6,3 +6,4 @@ Mastodon.py==2.0.1
 pandas==2.2.3
 platformdirs==4.3.8
 scikit-learn==1.6.1
+pydantic==2.11.5
