@@ -16,7 +16,7 @@
       
       
       <link rel="icon" href="../images/Blueprint-logo-black-flavicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.9">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
     
     
       
@@ -24,7 +24,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.4af4bdda.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.342714a4.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.06af60db.min.css">
@@ -147,11 +147,13 @@
     
     
     
-      <label class="md-header__button md-icon" for="__search">
-        
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-      </label>
-      <div class="md-search" data-md-component="search" role="dialog">
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
@@ -183,6 +185,7 @@
     </div>
   </div>
 </div>
+      
     
     
       <div class="md-header__source">
@@ -254,6 +257,7 @@
       <a href=".." class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
     Home
     
@@ -284,6 +288,7 @@
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
+  
   <span class="md-ellipsis">
     Getting Started
     
@@ -295,6 +300,7 @@
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
+  
   
   <span class="md-ellipsis">
     Getting Started
@@ -412,6 +418,7 @@
       <a href="../step-by-step-guide/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
     Step-by-Step Guide
     
@@ -433,6 +440,7 @@
       <a href="../customization/" class="md-nav__link">
         
   
+  
   <span class="md-ellipsis">
     Customization Guide
     
@@ -453,6 +461,7 @@
     <li class="md-nav__item">
       <a href="../future-features-contributions/" class="md-nav__link">
         
+  
   
   <span class="md-ellipsis">
     Future Features & Contributions
@@ -597,7 +606,7 @@
 <p>The BYOTA demo is a <a href="https://marimo.io/">marimo</a> application that allows you to experiment with BYOTA's features using synthetic data. You can run it in one of the following ways:</p>
 <ul>
 <li>one-click access to HuggingFace spaces:</li>
-<li><a href="https://huggingface.co/spaces/mozilla-ai/byota"><img alt="Try on Spaces" src="https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue" /></a>  (👉 make sure link is ok)</li>
+<li><a href="https://huggingface.co/spaces/mozilla-ai/byota"><img alt="Try on Spaces" src="https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue" /></a></li>
 <li>locally with Docker:</li>
 <li><code>docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota:latest demo.py</code></li>
 <li>open a browser and connect to http://localhost:2718</li>
@@ -624,14 +633,37 @@ Note that this URL is, unless specified differently by your instance admins, the
 <p>Once the container is up and running, you can open the marimo notebook (which is started by default in <a href="https://docs.marimo.io/guides/apps/">app view</a>) by connecting to http://localhost:2718. You will be asked a password which is, by default, <code>byota</code> (you can customize it in the <code>entrypoint.sh</code> file when you build your own image).</p>
 <blockquote>
 <p><strong>NOTE</strong></p>
-<p>If for any reason you don't want to directly pass your credentials on the command line, you can also run the docker container as follows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota:latest
+<p>If for any reason you don't want to directly pass your credentials on the command line, you can also create a JSON
+file called <code>auth.json</code>, formatted like follows:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>[
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  {
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>  &quot;account_type&quot;: &quot;mastodon&quot;,
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  &quot;name&quot;: &quot;profile_name&quot;,
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>  &quot;MASTODON_ACCESS_TOKEN&quot;: &quot;&lt;your_access_token&gt;&quot;,
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  &quot;MASTODON_API_BASE_URL&quot;: &quot;&lt;your_api_base_url&gt;&quot;
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>  }
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>]
 </span></code></pre></div>
-<p>... and provide the credentials in a json file called <code>auth.json</code>, formatted like follows:</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>{
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  &quot;MASTODON_ACCESS_TOKEN&quot;: &quot;&lt;your_access_token&gt;&quot;,
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  &quot;MASTODON_API_BASE_URL&quot;: &quot;&lt;your_api_base_url&gt;&quot;
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>}
+<p>and run the docker container as follows:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>docker run -v /absolute/path/to/your/auth.json:/home/user/byota/src/auth.json -it -p 8080:8080 -p 2719:2718 mzdotai/byota:latest
+</span></code></pre></div>
+<p>Note that the <code>auth.json</code> file defines <em>a list of accounts</em>: if you have more than one mastodon account, you can
+create credentials for each following the instructions above and add all of them to the same configuration file:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>[
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  {
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  &quot;account_type&quot;: &quot;mastodon&quot;,
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  &quot;name&quot;: &quot;profile_name_1&quot;,
+</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>  &quot;MASTODON_ACCESS_TOKEN&quot;: &quot;&lt;your_access_token_1&gt;&quot;,
+</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  &quot;MASTODON_API_BASE_URL&quot;: &quot;&lt;your_api_base_url_1&gt;&quot;
+</span><span id="__span-3-7"><a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  },
+</span><span id="__span-3-8"><a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>  {
+</span><span id="__span-3-9"><a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  &quot;account_type&quot;: &quot;mastodon&quot;,
+</span><span id="__span-3-10"><a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>  &quot;name&quot;: &quot;profile_name_2&quot;,
+</span><span id="__span-3-11"><a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>  &quot;MASTODON_ACCESS_TOKEN&quot;: &quot;&lt;your_access_token_2&gt;&quot;,
+</span><span id="__span-3-12"><a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>  &quot;MASTODON_API_BASE_URL&quot;: &quot;&lt;your_api_base_url_2&gt;&quot;
+</span><span id="__span-3-13"><a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>  },
+</span><span id="__span-3-14"><a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>  ...
+</span><span id="__span-3-15"><a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>]
 </span></code></pre></div>
 </blockquote>
 <h3 id="running-byota-into-your-system">Running BYOTA into your system</h3>
@@ -717,10 +749,12 @@ If you have chosen to use ollama instead, at the moment you need to manually pro
     </div>
     
     
-    <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.f8cc74c7.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+      
+      <script id="__config" type="application/json">{"base": "..", "features": ["content.code.copy", "content.tabs.link"], "search": "../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.c8b220af.min.js"></script>
+      <script src="../assets/javascripts/bundle.13a4f30d.min.js"></script>
       
     
   </body>
