@@ -148,9 +148,9 @@ def create_query_form():
     return query_form
 
 
-def create_tag_form(user_account: str):
+def create_tag_form(user_account: str, default_value: str = "gopher"):
     tag_form = mo.ui.text(
-        value="gopher",
+        value=default_value,
         label=f"Enter a tag name to download from the `{user_account}` account:\n",
     )
 

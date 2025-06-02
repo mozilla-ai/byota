@@ -1,7 +1,6 @@
 import json
 import os
 from pathlib import Path
-from typing import List
 from pydantic import BaseModel, field_validator
 
 
@@ -24,7 +23,7 @@ class LegacyConfig(BaseModel):
     MASTODON_API_BASE_URL: str
 
 
-def load_accounts(cred_filename: str = "auth.json") -> List[MastodonAccount]:
+def load_accounts(cred_filename: str = "auth.json") -> list[MastodonAccount]:
     """
     Load account configurations from file or environment variables.
 
@@ -75,3 +74,13 @@ def load_accounts(cred_filename: str = "auth.json") -> List[MastodonAccount]:
         ]
 
     return accounts
+
+
+def mock_account_list(name="Default") -> list[MastodonAccount]:
+    return [
+        MastodonAccount(
+            name=name,
+            MASTODON_ACCESS_TOKEN="",
+            MASTODON_API_BASE_URL="",
+        )
+    ]
