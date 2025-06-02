@@ -24,3 +24,4 @@ src/auth.json
 **/.DS_Store
 dump_*.pkl
 src/dump_*.pkl
+uv.lock
