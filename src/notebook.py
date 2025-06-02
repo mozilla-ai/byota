@@ -22,6 +22,7 @@ def _():
     import altair as alt
     from sklearn.manifold import TSNE
     import pandas as pd
+    import numpy as np
 
     from byota.embeddings import (
         EmbeddingService,
@@ -44,6 +45,7 @@ def _():
         config,
         layout,
         mo,
+        np,
         pd,
         pickle,
         time,
@@ -131,9 +133,6 @@ def _(
 
 @app.cell
 def _(mo):
-    # mo.md(f"""
-    # ###Downloading statuses from the following timelines: {", ".join([x["name"] for x in timelines])}
-    # """).center()
     mo.md("### Downloading timelines").center()
     return
 
@@ -146,6 +145,14 @@ def _(byota, cached_dataframes, clients, dataframes_data_file, mo, timelines):
 
     mo.stop(dataframes is None, mo.md("**Issues building dataframes**"))
     return (dataframes,)
+
+
+@app.cell
+def _(dataframes, mo):
+    mo.md(f"""
+    ### Calculating embeddings for the downloaded timeline{"s" if len(dataframes.keys())>1 else ""}
+    """).center()
+    return
 
 
 @app.cell
@@ -166,17 +173,7 @@ def _(
 
 
 @app.cell
-def _(dataframes, mo):
-    mo.md(f"""
-    ### Calculating embeddings for the downloaded timeline{"s" if len(dataframes.keys())>1 else ""}
-    """).center()
-    return
-
-
-@app.cell
-def _(TSNE, alt, dataframes, embeddings, mo, pd):
-    import numpy as np
-
+def _(TSNE, alt, dataframes, embeddings, mo, np, pd):
     def tsne(dataframes, embeddings, perplexity, random_state=42):
         """Runs dimensionality reduction using TSNE on the input embeddings.
         Returns dataframes containing status id, text, and 2D coordinates
@@ -208,7 +205,7 @@ def _(TSNE, alt, dataframes, embeddings, mo, pd):
         .mark_point()
         .encode(x="x", y="y", color="label")
     )
-    return all_embeddings, chart, df_, np
+    return all_embeddings, chart, df_
 
 
 @app.cell
