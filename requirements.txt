@@ -1,9 +1,9 @@
 altair==5.5.0
-beautifulsoup4==4.13.3
+beautifulsoup4==4.13.4
 loguru==0.7.3
-marimo==0.11.21
+marimo==0.13.13
 Mastodon.py==2.0.1
 pandas==2.2.3
-platformdirs>=2.1
-pyarrow==19.0.1
+platformdirs==4.3.8
 scikit-learn==1.6.1
+pydantic==2.11.5

@@ -23,7 +23,7 @@ pass as an input you can work with synthetic data (as we did in the demo), feeds
 summaries from RSS feeds... Your imagination is the limit!
 
 
-## 💡 Other Customization Ideas
+## 💡 **Other Customization Ideas**
 
 Do you want to run different algorithms or create a whole new application based on BYOTA's ideas? We like your enthusiasm 😁
 You can clone the repo and start changing BYOTA's code straight away, just follow the steps in

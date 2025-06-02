@@ -1,4 +1,5 @@
 import json
+from loguru import logger
 import numpy as np
 import requests
 
@@ -14,7 +15,11 @@ class EmbeddingService:
         """Checks if the service is there and working by trying
         to send an actual embedding request.
         """
-        pass
+
+        try:
+            return self.get_embedding("") is not None
+        except Exception:
+            return False
 
     def get_embedding(self, text: str) -> list:
         """Given an input text, returns the embeddings as calculated
@@ -38,13 +43,6 @@ class EmbeddingService:
 
 
 class LLamafileEmbeddingService(EmbeddingService):
-    def is_working(self):
-        response = requests.request(
-            url=self._url,
-            method="POST",
-        )
-        return response.status_code == 200
-
     def get_embedding(self, text: str) -> list:
         try:
             response = requests.request(
@@ -54,7 +52,7 @@ class LLamafileEmbeddingService(EmbeddingService):
             )
             response.raise_for_status()
         except requests.RequestException as e:
-            print(f"Request failed: {e}")
+            logger.error(f"Request failed: {e}")
             raise
 
         return json.loads(response.text)["embedding"]
@@ -64,14 +62,6 @@ class OllamaEmbeddingService(EmbeddingService):
     def __init__(self, url: str, model: str):
         # model is compulsory for ollama
         super().__init__(url, model)
-
-    def is_working(self):
-        response = requests.request(
-            url=self._url,
-            method="POST",
-            data=json.dumps({"model": self._model, "input": ""}),
-        )
-        return response.status_code
 
     def get_embedding(self, text: str):
         # workaround for ollama breaking with empty input text
@@ -86,7 +76,7 @@ class OllamaEmbeddingService(EmbeddingService):
             )
             response.raise_for_status()
         except requests.RequestException as e:
-            print(f"Request failed: {e}")
+            logger.error(f"Request failed: {e}")
             raise
 
         return json.loads(response.text)["embeddings"][0]

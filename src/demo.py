@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.11.21"
+__generated_with = "0.13.13"
 app = marimo.App(width="medium")
 
 
@@ -22,26 +22,23 @@ def _():
     import altair as alt
     from sklearn.manifold import TSNE
     import pandas as pd
-    from pathlib import Path
-    import json
-    import os
     import numpy as np
 
     from byota.embeddings import EmbeddingService, LLamafileEmbeddingService
-
+    import byota.config as config
+    import byota.layout as layout
     from byota.search import SearchService
 
     return (
         EmbeddingService,
         LLamafileEmbeddingService,
-        Path,
         SearchService,
         TSNE,
         alt,
-        json,
+        config,
+        layout,
         mo,
         np,
-        os,
         pd,
         pickle,
         time,
@@ -50,9 +47,7 @@ def _():
 
 @app.cell
 def _():
-    # internal variables
-
-    # dump files for offline mode
+    # demo dataset files
     dataframes_data_file = "data/dump_dataframes_demo.pkl"
     embeddings_data_file = "data/dump_embeddings_demo.pkl"
     user_statuses_data_file = "data/dump_user_statuses_demo.pkl"
@@ -63,26 +58,28 @@ def _():
 def _(mo):
     mo.md(
         """
-        # Build Your Own Timeline Algorithm
+    # Build Your Own Timeline Algorithm
 
-        Welcome to BYOTA's demo!
+    Welcome to BYOTA's demo!
 
-        This small Web application shows some of the things you could do running BYOTA's code on your own timeline.
-        As this is open for anyone to use, this version of the code does not connect to any real social network, but uses either synthetic data (to simulate posts in the home, local, and public timelines) or posts from [my Mastodon account](http://fosstodon.org/@mala).
+    This small Web application shows some of the things you could do running BYOTA's code on your own timeline.
+    As this is open for anyone to use, this version of the code does not connect to any real social network: regardless of what you specify in the Configuration form below, it will load synthetic data (to simulate posts in the home, local, and public timelines) and posts from [my Mastodon account](http://fosstodon.org/@mala).
+    Embeddings will be calculated in realtime using a local version of llamafile, serving the `all-minilm` embedding model.
 
-        If you want to use BYOTA with your own data, feel free to check its [⌨️ code](https://github.com/mozilla-ai/byota)
-        and [📖 documentation](https://mozilla-ai.github.io/byota/).
+    If you want to use BYOTA with your own data, feel free to check its [⌨️ code](https://github.com/mozilla-ai/byota)
+    and [📖 documentation](https://mozilla-ai.github.io/byota/).
 
-        So, feel free to just click "submit" in the following Configuration form and... see what happens!
-        """
+    Now, click "submit" in the following Configuration form and... see what happens!
+    """
     )
     return
 
 
 @app.cell
-def _(configuration_form):
+def _(config, layout):
+    configuration_form = layout.create_configuration_form(config.mock_account_list())
     configuration_form
-    return
+    return (configuration_form,)
 
 
 @app.cell
@@ -90,12 +87,13 @@ def _(
     LLamafileEmbeddingService,
     configuration_form,
     dataframes_data_file,
-    invalid_form,
+    layout,
     load_dataframes,
     mo,
 ):
+    # check for anything invalid in the form
     mo.stop(
-        invalid_form(configuration_form),
+        layout.invalid_form(configuration_form),
         mo.md("**Submit the form to continue.**").center(),
     )
 
@@ -173,7 +171,7 @@ def _(TSNE, alt, dataframes, embeddings, mo, np, pd):
         .mark_point()
         .encode(x="x", y="y", color="label")
     )
-    return all_embeddings, chart, df_, tsne
+    return all_embeddings, chart, df_
 
 
 @app.cell
@@ -198,9 +196,10 @@ def _(chart, mo):
 
 
 @app.cell
-def _(embeddings, mo, query_form):
+def _(embeddings, layout, mo):
     mo.stop(embeddings is None)
 
+    query_form = layout.create_query_form()
     mo.vstack(
         [
             mo.md("# Timeline search"),
@@ -218,7 +217,7 @@ def _(embeddings, mo, query_form):
             query_form,
         ]
     )
-    return
+    return (query_form,)
 
 
 @app.cell
@@ -226,12 +225,16 @@ def _(SearchService, all_embeddings, df_, embedding_service, query_form):
     search_service = SearchService(all_embeddings, embedding_service)
     indices = search_service.most_similar_indices(query_form.value)
     df_.iloc[indices][["label", "text"]]
-    return indices, search_service
+    return
 
 
 @app.cell
-def _(embeddings, mo, rerank_form):
+def _(dataframes, embeddings, layout, mo):
     mo.stop(embeddings is None)
+
+    rerank_form = layout.create_rerank_form(
+        list(dataframes.keys()), ["@mala's statuses"]
+    )
 
     mo.vstack(
         [
@@ -253,7 +256,7 @@ def _(embeddings, mo, rerank_form):
             rerank_form,
         ]
     )
-    return
+    return (rerank_form,)
 
 
 @app.cell
@@ -325,13 +328,7 @@ def _(
             dataframes[timeline_to_rerank].iloc[idx][["label", "text"]],
         ]
     )
-    return (
-        idx,
-        rerank_start_time,
-        timeline_to_rerank,
-        user_statuses_df,
-        user_statuses_embeddings,
-    )
+    return user_statuses_df, user_statuses_embeddings
 
 
 @app.cell
@@ -365,8 +362,10 @@ def _():
 
 
 @app.cell
-def _(mo, rerank_form, tag_form):
+def _(layout, mo, rerank_form):
     mo.stop(rerank_form.value is None)
+
+    tag_form = layout.create_tag_form("Local file", "retrogaming")
 
     mo.vstack(
         [
@@ -394,7 +393,7 @@ def _(mo, rerank_form, tag_form):
             tag_form,
         ]
     )
-    return
+    return (tag_form,)
 
 
 @app.cell
@@ -434,139 +433,7 @@ def _(
         ]
     )
     # my_posts_df[['text', 'scores']]
-    return my_idx, tag_name, tag_posts_df, tag_posts_embeddings
-
-
-@app.cell
-def _(mo):
-    # Create the Configuration form
-
-    configuration_form = (
-        mo.md(
-            """
-        # Configuration
-        (NOTE: settings will be ignored in this demo, data will be loaded from a file)
-
-        **Timelines**
-
-        {tl_home} {tl_local} {tl_public}
-
-        {tl_hashtag} {tl_hashtag_txt} {tl_list} {tl_list_txt}
-
-        **Embeddings**
-
-        {emb_server}
-
-        {emb_server_url}
-
-        {emb_server_model}
-
-        **Caching**
-
-        {offline_mode}
-    """
-        )
-        .batch(
-            tl_home=mo.ui.checkbox(label="Home", value=True),
-            tl_local=mo.ui.checkbox(label="Local", value=True),
-            tl_public=mo.ui.checkbox(label="Public", value=True),
-            tl_hashtag=mo.ui.checkbox(label="Hashtag"),
-            tl_list=mo.ui.checkbox(label="List"),
-            tl_hashtag_txt=mo.ui.text(),
-            tl_list_txt=mo.ui.text(),
-            emb_server=mo.ui.radio(
-                label="Server type:",
-                options=["llamafile", "ollama"],
-                value="llamafile",
-                inline=True,
-            ),
-            emb_server_url=mo.ui.text(
-                label="Embedding server URL:",
-                value="http://localhost:8080/embedding",
-                full_width=True,
-            ),
-            emb_server_model=mo.ui.text(
-                label="Embedding server model:", value="all-minilm"
-            ),
-            offline_mode=mo.ui.checkbox(label="Run in offline mode (experimental)"),
-        )
-        .form(show_clear_button=True, bordered=True)
-    )
-
-    # a dictionary mapping Timeline UI checkboxes with the respective
-    # strings that identify them in the Mastodon API
-    timelines_dict = {
-        "tl_home": "home",
-        "tl_local": "local",
-        "tl_public": "public",
-        "tl_hashtag": "tag",
-        "tl_list": "list",
-    }
-
-    def invalid_form(form):
-        """A form (e.g. login) is invalid if it has no value,
-        or if any of its keys have no value."""
-        if form.value is None:
-            return True
-
-        for k in form.value.keys():
-            if form.value[k] is None:
-                return True
-
-        return False
-
-    return configuration_form, invalid_form, timelines_dict
-
-
-@app.cell
-def _(mo):
-    # Create a form for timeline re-ranking
-    rerank_form = (
-        mo.md(
-            """
-        # Re-ranking settings
-
-        **User statuses** (NOTE: data will be loaded from a file)
-
-
-        {num_user_status_pages}    {exclude_reblogs}
-
-        **Timeline to rerank**
-
-        {timeline_to_rerank}
-    """
-        )
-        .batch(
-            num_user_status_pages=mo.ui.slider(
-                start=1, stop=20, label="Number of pages to load", value=1
-            ),
-            timeline_to_rerank=mo.ui.radio(
-                options=["home", "local", "public"], value="public"
-            ),
-            exclude_reblogs=mo.ui.checkbox(label="Exclude reblogs", value=True),
-        )
-        .form(show_clear_button=True, bordered=True)
-    )
-    return (rerank_form,)
-
-
-@app.cell
-def _(mo):
-    query_form = mo.ui.text(
-        value="42",
-        label="Enter a status id or some free-form text to find the most similar statuses:\n",
-        full_width=True,
-    )
-    return (query_form,)
-
-
-@app.cell
-def _(mo):
-    tag_form = mo.ui.text(
-        value="retrogaming",
-        label="Enter a tag name:\n",
-    )
-    return (tag_form,)
+    return
 
 
 @app.cell

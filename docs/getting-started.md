@@ -13,7 +13,7 @@ These options are sorted by difficulty (the simplest one start with a single cli
 The BYOTA demo is a [marimo](https://marimo.io/) application that allows you to experiment with BYOTA's features using synthetic data. You can run it in one of the following ways:
 
 - one-click access to HuggingFace spaces:
-  - [![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/byota)  (👉 make sure link is ok)
+  - [![Try on Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Try%20on-Spaces-blue)](https://huggingface.co/spaces/mozilla-ai/byota)
 - locally with Docker:
   1. `docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota:latest demo.py`
   1. open a browser and connect to http://localhost:2718
@@ -51,19 +51,45 @@ Once the container is up and running, you can open the marimo notebook (which is
 
 > **NOTE**
 >
-> If for any reason you don't want to directly pass your credentials on the command line, you can also run the docker container as follows:
+> If for any reason you don't want to directly pass your credentials on the command line, you can also create a JSON
+> file called `auth.json`, formatted like follows:
 >
 >```
->docker run -it -p 8080:8080 -p 2718:2718 mzdotai/byota:latest
->```
->
->... and provide the credentials in a json file called `auth.json`, formatted like follows:
->
->```
->{
+>[
+>  {
+>  "account_type": "mastodon",
+>  "name": "profile_name",
 >  "MASTODON_ACCESS_TOKEN": "<your_access_token>",
 >  "MASTODON_API_BASE_URL": "<your_api_base_url>"
->}
+>  }
+>]
+>```
+>
+> and run the docker container as follows:
+>
+>```
+>docker run -v /absolute/path/to/your/auth.json:/home/user/byota/src/auth.json -it -p 8080:8080 -p 2719:2718 mzdotai/byota:latest
+>```
+>
+> Note that the `auth.json` file defines *a list of accounts*: if you have more than one mastodon account, you can
+> create credentials for each following the instructions above and add all of them to the same configuration file:
+>
+>```
+>[
+>  {
+>  "account_type": "mastodon",
+>  "name": "profile_name_1",
+>  "MASTODON_ACCESS_TOKEN": "<your_access_token_1>",
+>  "MASTODON_API_BASE_URL": "<your_api_base_url_1>"
+>  },
+>  {
+>  "account_type": "mastodon",
+>  "name": "profile_name_2",
+>  "MASTODON_ACCESS_TOKEN": "<your_access_token_2>",
+>  "MASTODON_API_BASE_URL": "<your_api_base_url_2>"
+>  },
+>  ...
+>]
 >```
 
 
