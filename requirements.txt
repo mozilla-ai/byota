@@ -1,7 +1,7 @@
 altair==5.5.0
 beautifulsoup4==4.13.4
 loguru==0.7.3
-marimo==0.13.13
+marimo==0.23.0
 Mastodon.py==2.0.1
 pandas==2.2.3
 platformdirs==4.3.8
