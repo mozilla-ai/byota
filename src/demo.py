@@ -320,7 +320,7 @@ def _(
     this one how ranking changes depending on the contents you include.
     """),
             user_statuses_df,
-            mo.md("""## Your re-ranked timeline:
+            mo.md(f"""## Your re-ranked timeline ({timeline_to_rerank}):
     This table shows posts from the synthetic timelines (you can choose between home, local, and public
     in the form above), re-ranked to prioritize the main topics inferred from the posts in the previous table.
     """),
