@@ -296,6 +296,27 @@ def _(
     user_statuses_df = pd.DataFrame(
         byota.mastodon.get_compact_data(user_statuses), columns=["id", "text"]
     )
+
+    # Without any of the user's own posts we cannot build a "goal vector"
+    # to re-rank the timeline against, so stop with a helpful message
+    # instead of failing later on an empty matrix multiplication.
+    mo.stop(
+        len(user_statuses_df) == 0,
+        mo.md(
+            f"""**No posts found for `{user_account}`, so the timeline cannot be re-ranked.**
+
+This can happen when:
+
+- the account hasn't published any posts yet (or only replies/reblogs, which may be excluded above);
+- the account's profile is set to **not** be discoverable in search engines (`discoverable = False`), in which case its posts are skipped on purpose;
+- the credentials used point to a different account than expected.
+
+Try publishing a few posts, enabling profile discoverability in your Mastodon
+settings, or lowering the `exclude_replies`/`exclude_reblogs` options before
+submitting the form again."""
+        ),
+    )
+
     user_statuses_embeddings = embedding_service.calculate_embeddings(
         user_statuses_df["text"]
     )
@@ -411,6 +432,25 @@ def _(byota, client_for_user_posts, embedding_service, mo, pd, rerank_form):
     my_posts_df = pd.DataFrame(
         byota.mastodon.get_compact_data(my_posts), columns=["id", "text"]
     )
+
+    # Without any of your own posts there is nothing to re-rank, and the
+    # downstream similarity computation would fail on an empty matrix.
+    mo.stop(
+        len(my_posts_df) == 0,
+        mo.md(
+            """**No posts of yours were found, so there is nothing to re-rank here.**
+
+This can happen when:
+
+- you haven't published any posts yet (replies and reblogs are excluded here);
+- your profile is set to **not** be discoverable in search engines
+  (`discoverable = False`), in which case your posts are skipped on purpose.
+
+Publish a few posts or enable profile discoverability in your Mastodon
+settings, then re-run this notebook."""
+        ),
+    )
+
     my_posts_embeddings = embedding_service.calculate_embeddings(my_posts_df["text"])
     return my_posts_df, my_posts_embeddings
 
