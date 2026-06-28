@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.13.13"
+__generated_with = "0.23.11"
 app = marimo.App(width="medium")
 
 
@@ -56,8 +56,7 @@ def _():
 
 @app.cell
 def _(mo):
-    mo.md(
-        """
+    mo.md("""
     # Build Your Own Timeline Algorithm
 
     Welcome to BYOTA's demo!
@@ -70,8 +69,7 @@ def _(mo):
     and [📖 documentation](https://mozilla-ai.github.io/byota/).
 
     Now, click "submit" in the following Configuration form and... see what happens!
-    """
-    )
+    """)
     return
 
 
@@ -167,7 +165,7 @@ def _(TSNE, alt, dataframes, embeddings, mo, np, pd):
     df_, all_embeddings = tsne(dataframes, embeddings, perplexity=4)
 
     chart = mo.ui.altair_chart(
-        alt.Chart(df_, title="Timeline Visualization", height=500)
+        alt.Chart(df_, title="Timeline Visualization", height=500, width=900)
         .mark_point()
         .encode(x="x", y="y", color="label")
     )
@@ -187,7 +185,11 @@ def _(chart, mo):
                 post contents), or search their content.
             """),
             chart,
-            chart.value[["id", "label", "text"]]
+            mo.ui.table(
+                chart.value[["id", "label", "text"]],
+                column_widths={"text": 820},
+                selection=None,
+            )
             if len(chart.value) > 0
             else chart.value,
         ]
@@ -221,10 +223,14 @@ def _(embeddings, layout, mo):
 
 
 @app.cell
-def _(SearchService, all_embeddings, df_, embedding_service, query_form):
+def _(SearchService, all_embeddings, df_, embedding_service, mo, query_form):
     search_service = SearchService(all_embeddings, embedding_service)
     indices = search_service.most_similar_indices(query_form.value)
-    df_.iloc[indices][["label", "text"]]
+    mo.ui.table(
+        df_.iloc[indices][["label", "text"]],
+        column_widths={"text": 950},
+        selection=None,
+    )
     return
 
 
@@ -319,13 +325,17 @@ def _(
     their number in the form above (1 page = 20 posts), check them out here, and verify in the table below
     this one how ranking changes depending on the contents you include.
     """),
-            user_statuses_df,
+            mo.ui.table(user_statuses_df, column_widths={"text": 920}, selection=None),
             mo.md("""## Your re-ranked timeline:
     This table shows posts from the synthetic timelines (you can choose between home, local, and public
     in the form above), re-ranked to prioritize the main topics inferred from the posts in the previous table.
     """),
-            # show statuses sorted by idx
-            dataframes[timeline_to_rerank].iloc[idx][["label", "text"]],
+            mo.ui.table(
+                # show statuses sorted by idx
+                dataframes[timeline_to_rerank].iloc[idx][["label", "text"]],
+                column_widths={"text": 930},
+                selection=None,
+            ),
         ]
     )
     return user_statuses_df, user_statuses_embeddings
@@ -429,7 +439,11 @@ def _(
             mo.md(
                 f"### Your own posts, re-ranked according to their similarity to posts in {tag_name}"
             ),
-            user_statuses_df.iloc[my_idx][["text", "scores"]],
+            mo.ui.table(
+                user_statuses_df.iloc[my_idx][["text", "scores"]],
+                column_widths={"text": 880},
+                selection=None,
+            ),
         ]
     )
     # my_posts_df[['text', 'scores']]
