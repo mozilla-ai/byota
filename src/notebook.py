@@ -1,6 +1,6 @@
 import marimo
 
-__generated_with = "0.13.13"
+__generated_with = "0.23.11"
 app = marimo.App(width="medium")
 
 
@@ -201,7 +201,7 @@ def _(TSNE, alt, dataframes, embeddings, mo, np, pd):
     df_, all_embeddings = tsne(dataframes, embeddings, perplexity=16)
 
     chart = mo.ui.altair_chart(
-        alt.Chart(df_, title="Timeline Visualization", height=500)
+        alt.Chart(df_, title="Timeline Visualization", height=500, width=880)
         .mark_point()
         .encode(x="x", y="y", color="label")
     )
@@ -212,8 +212,20 @@ def _(TSNE, alt, dataframes, embeddings, mo, np, pd):
 def _(chart, mo):
     mo.vstack(
         [
+            mo.md("# Embeddings visualization").center(),
+            mo.md("""
+                In this section, you can see posts from different timelines represented as points on a plane:
+                You can click on a timeline label on the top right to highlight only posts from that timeline.
+                If you select one or more points, you will see them in the table below the plot.
+                By clicking on the column names (e.g. `label`, `text`) you can sort them, wrap text (to see full
+                post contents), or search their content.
+            """),
             chart,
-            chart.value[["id", "label", "text"]]
+            mo.ui.table(
+                chart.value[["id", "label", "text"]],
+                column_widths={"text": 800},
+                selection=None,
+            )
             if len(chart.value) > 0
             else chart.value,
         ]
@@ -231,10 +243,14 @@ def _(embeddings, layout, mo):
 
 
 @app.cell
-def _(SearchService, all_embeddings, df_, embedding_service, query_form):
+def _(SearchService, all_embeddings, df_, embedding_service, mo, query_form):
     search_service = SearchService(all_embeddings, embedding_service)
     indices = search_service.most_similar_indices(query_form.value)
-    df_.iloc[indices][["label", "text"]]
+    mo.ui.table(
+        df_.iloc[indices][["label", "text"]],
+        column_widths={"text": 940},
+        selection=None,
+    )
     return
 
 
@@ -310,11 +326,22 @@ def _(
     # show everything
     mo.vstack(
         [
-            mo.md("## Your statuses:"),
-            user_statuses_df,
-            mo.md("## Your re-ranked timeline:"),
-            # show statuses sorted by idx
-            dataframes[timeline_to_rerank].iloc[idx][["label", "text"]],
+            mo.md("""## Your statuses:
+    This table shows the content of the posts that are used for re-ranking the timeline. You can change
+    their number in the form above (1 page = 20 posts), check them out here, and verify in the table below
+    this one how ranking changes depending on the contents you include.
+    """),
+            mo.ui.table(user_statuses_df, column_widths={"text": 940}, selection=None),
+            mo.md("""## Your re-ranked timeline:
+    This table shows posts from the synthetic timelines (you can choose between home, local, and public
+    in the form above), re-ranked to prioritize the main topics inferred from the posts in the previous table.
+    """),
+            mo.ui.table(
+                # show statuses sorted by idx
+                dataframes[timeline_to_rerank].iloc[idx][["label", "text"]],
+                column_widths={"text": 940},
+                selection=None,
+            ),
         ]
     )
     return client_for_user_posts, user_account
@@ -426,7 +453,11 @@ def _(
             mo.md(
                 f"### Your own posts, re-ranked according to their similarity to posts in {user_account}:{tag_name}"
             ),
-            my_posts_df.iloc[my_idx][["text", "scores"]],
+            mo.ui.table(
+                my_posts_df.iloc[my_idx][["text", "scores"]],
+                column_widths={"text": 880},
+                selection=None,
+            ),
         ]
     )
     # my_posts_df[['text', 'scores']]
