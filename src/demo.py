@@ -75,7 +75,9 @@ def _(mo):
 
 @app.cell
 def _(config, layout):
-    configuration_form = layout.create_configuration_form(config.mock_account_list())
+    configuration_form = layout.create_configuration_form(
+        config.mock_account_list(), include_embedding_config=False
+    )
     configuration_form
     return (configuration_form,)
 
@@ -95,6 +97,7 @@ def _(
         mo.md("**Submit the form to continue.**").center(),
     )
 
+    # the demo always uses the bundled llamafile embedding server
     embedding_service = LLamafileEmbeddingService("http://localhost:8080/embedding")
 
     mo.stop(

@@ -15,12 +15,17 @@ def invalid_form(form):
     return False
 
 
-def create_configuration_form(accounts: list[MastodonAccount]):
+def create_configuration_form(
+    accounts: list[MastodonAccount], include_embedding_config: bool = True
+):
     """
     Create a dynamic configuration form based on the loaded accounts.
 
     Args:
         accounts: list of MastodonAccount objects
+        include_embedding_config: whether to expose the embedding server
+            fields (server type, URL, model). Set to False for the demo,
+            where the embedding server is fixed to the bundled llamafile.
 
     Returns:
         Marimo form object
@@ -46,24 +51,35 @@ def create_configuration_form(accounts: list[MastodonAccount]):
         batch_dict[f"tl_{account_name}_list_txt"] = mo.ui.text()
 
     # Add the non-timeline fields
-    batch_dict.update(
-        {
-            "emb_server": mo.ui.radio(
-                label="Server type:",
-                options=["llamafile", "ollama"],
-                value="llamafile",
-                inline=True,
-            ),
-            "emb_server_url": mo.ui.text(
-                label="Embedding server URL:",
-                value="http://localhost:8080/embedding",
-                full_width=True,
-            ),
-            "emb_server_model": mo.ui.text(
-                label="Embedding server model:", value="all-minilm"
-            ),
-            "offline_mode": mo.ui.checkbox(label="Run in offline mode (experimental)"),
-        }
+    embeddings_section = ""
+    if include_embedding_config:
+        batch_dict.update(
+            {
+                "emb_server": mo.ui.radio(
+                    label="Server type:",
+                    options=["llamafile", "ollama"],
+                    value="llamafile",
+                    inline=True,
+                ),
+                "emb_server_url": mo.ui.text(
+                    label="Embedding server URL:",
+                    value="http://localhost:8080/embedding",
+                    full_width=True,
+                ),
+                "emb_server_model": mo.ui.text(
+                    label="Embedding server model:", value="all-minilm"
+                ),
+            }
+        )
+        embeddings_section = (
+            "**Embeddings**\n\n"
+            "{emb_server}\n\n"
+            "{emb_server_url}\n\n"
+            "{emb_server_model}"
+        )
+
+    batch_dict["offline_mode"] = mo.ui.checkbox(
+        label="Run in offline mode (experimental)"
     )
 
     # Create the form
@@ -73,13 +89,8 @@ def create_configuration_form(accounts: list[MastodonAccount]):
 
 **Timelines**
 {timelines_section}
-**Embeddings**
 
-{{emb_server}}
-
-{{emb_server_url}}
-
-{{emb_server_model}}
+{embeddings_section}
 
 **Caching**
 
