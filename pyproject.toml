@@ -28,7 +28,7 @@ docs = [
 ]
 
 tests = [
-  "pytest>=8,<9",
+  "pytest>=9.0.3,<10",
   "pytest-sugar>=0.9.6",
 ]
 
